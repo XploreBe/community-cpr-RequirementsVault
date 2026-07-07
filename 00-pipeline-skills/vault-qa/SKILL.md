@@ -136,8 +136,9 @@ needs_clarification` line in the output contract.
 - Treating silence (no matching ID found) as permission to guess the likely answer.
 - Writing the CHG proposal as if it were already approved (e.g. saying "this has been updated to
   X") — it must read as a draft awaiting a decision, not as a fact.
-- Auto-closing the issue, editing labels beyond `possible-change`, or taking any GitHub action
-  beyond posting the answer comment — that's the calling script's job to manage, not this skill's.
+- Auto-closing the issue, editing labels yourself, or taking any GitHub action beyond producing
+  the `mode`/`answer`/`chg_proposal` JSON — the calling script owns posting the comment and
+  keeping the issue's `status:*` triage label in sync with `mode`, not this skill's job.
 - Using Mode C as a way to avoid committing to an honest "not specified" answer — if the question
   is clear but the vault is silent, that's Mode A with a stated gap, not Mode C.
 - Picking a reading in Mode C because it "seems more likely" — the entire point is that the skill

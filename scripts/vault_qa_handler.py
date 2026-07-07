@@ -4,7 +4,9 @@ vault_qa_handler.py
 Runs the vault-qa skill against a single GitHub Issue and posts the result back as a comment.
 
 Read-only against the vault: this script never writes to any vault file. Its only side effects
-are GitHub API calls: posting one comment, and optionally adding the 'possible-change' label.
+are GitHub API calls: posting one comment, and keeping exactly one 'status:*' triage label
+(status:answered / status:possible-change / status:needs-clarification / status:rate-limited)
+on the issue in sync with the most recent comment's STATUS.
 
 Env vars required (all set by the workflow):
   ANTHROPIC_API_KEY  - Claude API key
@@ -39,6 +41,19 @@ STATUS_LINES = {
     "qa": "answered",
     "proposed_change": "proposed_change",
     "needs_clarification": "needs_clarification",
+}
+
+# Maps each status_line value to the GitHub label that reflects it, so Mohamed can triage straight
+# from the Issues list (filter by label) instead of opening every issue to read the last comment's
+# STATUS line. Prefixed with "status:" to group them visually and avoid colliding with any labels
+# Mohamed adds himself. Kept separate from STATUS_LINES on purpose: STATUS_LINES is a stable
+# machine-readable contract other agents may already parse verbatim and must not change; these
+# labels are purely a human/GitHub-UI triage aid and can be renamed freely.
+STATUS_LABELS = {
+    "answered": "status:answered",
+    "proposed_change": "status:possible-change",
+    "needs_clarification": "status:needs-clarification",
+    "rate_limited": "status:rate-limited",
 }
 
 # Which vault documents are in scope for grounding an answer. Deliberately excludes the
@@ -214,6 +229,42 @@ def add_label(repo: str, issue_number: str, token: str, label: str) -> None:
     resp.raise_for_status()
 
 
+def get_current_labels(repo: str, issue_number: str, token: str) -> list[str]:
+    url = f"https://api.github.com/repos/{repo}/issues/{issue_number}/labels"
+    resp = requests.get(url, headers={"Authorization": f"Bearer {token}",
+                                       "Accept": "application/vnd.github+json"})
+    resp.raise_for_status()
+    return [label["name"] for label in resp.json()]
+
+
+def remove_label(repo: str, issue_number: str, token: str, label: str) -> None:
+    url = f"https://api.github.com/repos/{repo}/issues/{issue_number}/labels/{label}"
+    resp = requests.delete(url, headers={"Authorization": f"Bearer {token}",
+                                          "Accept": "application/vnd.github+json"})
+    # A 404 just means the label was already gone (e.g. a race with a manual edit) — not worth
+    # failing the whole run over.
+    if resp.status_code != 404:
+        resp.raise_for_status()
+
+
+def set_status_label(repo: str, issue_number: str, token: str, status_line: str) -> None:
+    """Make the issue's status:* label match status_line, replacing whatever status:* label was
+    there before. An issue's thread can shift mode across comments (e.g. Mode A, then a later
+    comment triggers Mode B) — this keeps exactly one status:* label present at a time so
+    filtering the Issues list by label always reflects the *current* state, not every state the
+    issue ever passed through. Labels outside the status:* namespace (vault-question, or anything
+    Mohamed adds by hand) are left untouched."""
+    desired = STATUS_LABELS.get(status_line)
+    if not desired:
+        return
+    current = get_current_labels(repo, issue_number, token)
+    for label in current:
+        if label.startswith("status:") and label != desired:
+            remove_label(repo, issue_number, token, label)
+    if desired not in current:
+        add_label(repo, issue_number, token, desired)
+
+
 def count_recent_bot_comments(repo: str, token: str) -> int:
     """Count how many comments the bot has posted anywhere in this repo in the trailing hour.
     One cheap API call, first page only (100 comments) — see README for the known blind spot on
@@ -319,6 +370,7 @@ def main() -> None:
             f"will just keep hitting this same limit. If this limit is too low for legitimate "
             f"usage, Mohamed can raise RATE_LIMIT_MAX_PER_HOUR in scripts/vault_qa_handler.py.",
         )
+        set_status_label(repo, issue_number, github_token, "rate_limited")
         return
 
     issue = get_issue(repo, issue_number, github_token)
@@ -336,9 +388,7 @@ def main() -> None:
         comment_body += "\n\n---\n\n" + result["chg_proposal"]
 
     post_comment(repo, issue_number, github_token, comment_body)
-
-    if result.get("mode") == "proposed_change":
-        add_label(repo, issue_number, github_token, "possible-change")
+    set_status_label(repo, issue_number, github_token, status_line)
 
 
 if __name__ == "__main__":
