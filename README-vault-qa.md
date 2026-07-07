@@ -28,9 +28,10 @@ info nodig hebben. Twee dingen zijn daarom expliciet ingebouwd, niet later toege
 
 1. Kopieer deze drie dingen naar de root van je vault-repo, op dezelfde plek als je bestaande
    `00-pipeline-skills/` map en `github-sync/` script.
-2. Maak in GitHub een label aan genaamd `vault-question` (Settings → Labels). Maak ook alvast
-   `possible-change` aan, al maakt het script dat label ook zelf aan bij eerste gebruik als het
-   nog niet bestaat.
+2. Maak in GitHub een label aan genaamd `vault-question` (Settings → Labels). De vier
+   triage-labels (`status:answered`, `status:possible-change`, `status:needs-clarification`,
+   `status:rate-limited`) hoef je niet zelf aan te maken, het script maakt ze zelf aan bij eerste
+   gebruik als ze nog niet bestaan — je kan ze daarna wel zelf een kleur geven.
 3. Voeg een repo secret toe: Settings → Secrets and variables → Actions → New repository secret
    → naam `ANTHROPIC_API_KEY`, waarde je API key. `GITHUB_TOKEN` heb je niet zelf nodig aan te
    maken, die levert GitHub Actions automatisch.
@@ -59,10 +60,17 @@ info nodig hebben. Twee dingen zijn daarom expliciet ingebouwd, niet later toege
 6. Claude antwoordt in het vaste JSON-format uit de skill, in een van drie modi: gewoon antwoord,
    antwoord + CHG-voorstel, of "de vraag zelf is ambigu, hier zijn de mogelijke lezingen."
 7. Het script prepend een machine-leesbare `STATUS:`-regel en post het geheel als comment op de
-   issue. Bij een CHG-voorstel wordt bovendien het label `possible-change` toegevoegd.
-8. Jij bekijkt `possible-change`-issues wanneer het je uitkomt, en beslist: goedkeuren (en dan
-   normaal via de change-management skill verwerken) of afwijzen. Er verandert niets aan de vault
-   totdat jij dat expliciet doet.
+   issue. Daarnaast zet het één triage-label op de issue dat de laatste status weergeeft:
+   `status:answered`, `status:possible-change`, `status:needs-clarification`, of
+   `status:rate-limited`. Verschuift een thread van mode (bijvoorbeeld eerst gewoon beantwoord,
+   later alsnog een CHG-signaal), dan verwijdert het script het oude statuslabel en zet het
+   nieuwe — een issue draagt dus altijd precies één statuslabel, dat de huidige stand weergeeft,
+   niet de hele geschiedenis. Labels buiten deze reeks (`vault-question`, of iets dat jij zelf
+   toevoegt) blijven onaangeroerd.
+8. Jij filtert op `status:possible-change` of `status:needs-clarification` wanneer het je uitkomt
+   om te zien wat nog iets van jou nodig heeft, en beslist: goedkeuren (en dan normaal via de
+   change-management skill verwerken) of afwijzen. Er verandert niets aan de vault totdat jij dat
+   expliciet doet.
 
 ## Wat dit NIET doet, expliciet
 

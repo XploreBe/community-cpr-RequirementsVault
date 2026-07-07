@@ -12,7 +12,7 @@ on:
     types: [created]
 
 permissions:
-  issues: write      # to post the answer comment and add the 'possible-change' label
+  issues: write      # to post the answer comment and manage the status:* triage label
   contents: read      # to read the vault files, nothing more
 
 jobs:
