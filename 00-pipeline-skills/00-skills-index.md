@@ -18,8 +18,11 @@ If you want to improve a skill, edit its `SKILL.md` and re-run the pipeline step
 | 3 | [[product-backlog/SKILL\|product-backlog]] | Scope + requirements | Epics, user stories, acceptance criteria |
 | 4 | [[speckit-spec/SKILL\|speckit-spec]] | Individual backlog stories | Dev-ready spec files for `/speckit.plan` |
 | ∞ | [[change-management/SKILL\|change-management]] | A change record (what changed, why) | Surgical edits to affected docs + change log entry |
+| ∞ | [[vault-qa/SKILL\|vault-qa]] | A question asked via a GitHub Issue | Answer, or a flagged CHG-proposal, posted back as an issue comment |
 
 The change-management skill runs outside the linear pipeline — any time a requirement, decision, or stakeholder input changes mid-project.
+
+The vault-qa skill also runs outside the linear pipeline — any time someone asks a question about the vault via a GitHub Issue. It never edits vault files itself; if a question implies something is outdated or wrong, it posts a proposed CHG record for a human to review and hand to change-management.
 
 ---
 
@@ -50,3 +53,8 @@ The change-management skill runs outside the linear pipeline — any time a requ
 - [[speckit-spec/SKILL|SKILL.md]] — instructions
 - [[speckit-spec/assets/speckit-spec-template|Output template]]
 - [[speckit-spec/examples/example-input-backlog-story|Example input]] · [[speckit-spec/examples/example-output-spec|Example output]]
+
+### 6. vault-qa *(runs any time a GitHub Issue asks a question about the vault)*
+- [[vault-qa/SKILL|SKILL.md]] — instructions
+- [[vault-qa/assets/chg-proposal-template|CHG-proposal template]] — format used for a draft change proposal, never a real edit
+- [[vault-qa/examples/example-1-mode-a|Example: Mode A (qa)]] · [[vault-qa/examples/example-2-mode-b|Example: Mode B (proposed_change)]] · [[vault-qa/examples/example-3-mode-c|Example: Mode C (needs_clarification)]]

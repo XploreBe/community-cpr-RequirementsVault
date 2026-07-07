@@ -1,0 +1,42 @@
+name: Vault Q&A
+
+# Two ways this fires:
+# 1. Someone opens/edits an issue and it carries (or gets) the 'vault-question' label.
+# 2. Someone posts a follow-up comment on an already-labeled 'vault-question' issue.
+# The bot's own comments are explicitly excluded from re-triggering itself (see the 'if' below) —
+# without that guard, the bot answering would itself count as a new comment and loop forever.
+on:
+  issues:
+    types: [labeled, edited]
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write      # to post the answer comment and add the 'possible-change' label
+  contents: read      # to read the vault files, nothing more
+
+jobs:
+  answer:
+    if: |
+      (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'vault-question')) ||
+      (github.event_name == 'issue_comment' && contains(github.event.issue.labels.*.name, 'vault-question') && github.event.comment.user.login != 'github-actions[bot]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout vault
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install anthropic requests
+
+      - name: Answer the question
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: python scripts/vault_qa_handler.py
