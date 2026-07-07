@@ -79,19 +79,27 @@ Trigger phrases (not exhaustive — judge intent, not exact wording): "that's no
 "can we just...", any statement asserting a new fact that contradicts a specific ID's current
 content.
 
-Output, in order:
-1. Answer the literal question first, citing current vault content, exactly as in Mode A.
-2. A clearly separated **"Possible change detected"** section containing a draft change record in
-   the format from `assets/chg-proposal-template.md`. Leave the CHG number as `CHG-xxx (draft —
-   not yet assigned)`. Fill in: affected ID(s), current value (quoted from the vault), proposed
-   new value (from what the asker said), reason, and source (link to the issue/comment where this
-   was said).
-3. A closing line, verbatim: **"This is a proposal only. No vault file has been changed. Mohamed
-   needs to review and approve before this is processed via change-management."**
+The posted comment has three parts, but they must be split across two separate JSON fields, not
+written together in one:
+
+1. **Goes in `answer`, and only this goes in `answer`:** the literal question answered, citing
+   current vault content, exactly as in Mode A. Nothing else — no CHG table, no closing line.
+2. **Goes in `chg_proposal`, together with part 3:** a clearly separated **"Possible change
+   detected"** section containing a draft change record in the format from
+   `assets/chg-proposal-template.md`. Leave the CHG number as `CHG-xxx (draft — not yet
+   assigned)`. Fill in: affected ID(s), current value (quoted from the vault), proposed new value
+   (from what the asker said), reason, and source (link to the issue/comment where this was said).
+3. **Also goes in `chg_proposal`, appended after part 2:** a closing line, verbatim: **"This is a
+   proposal only. No vault file has been changed. Mohamed needs to review and approve before this
+   is processed via change-management."**
 
 Do not soften or omit that closing line. Do not proceed to describe downstream impact in detail —
 that analysis is change-management's job once the record is approved; guessing at it here invites
 exactly the kind of silent scope creep the vault's change process exists to prevent.
+
+The calling script concatenates `answer` and `chg_proposal` itself to build the final comment (see
+"Output contract" below). Putting parts 2 and 3 into `answer` as well as `chg_proposal` duplicates
+the entire CHG table in the posted comment — keep `answer` to part 1 only.
 
 ## Mode C — the question itself is ambiguous
 
@@ -134,6 +142,11 @@ needs_clarification` line in the output contract.
   is clear but the vault is silent, that's Mode A with a stated gap, not Mode C.
 - Picking a reading in Mode C because it "seems more likely" — the entire point is that the skill
   doesn't get to make that call; a human or the agent's own logic does, after clarifying.
+- In Mode B, copying the CHG table and/or the closing line into `answer` as well as
+  `chg_proposal`. The calling script appends `chg_proposal` after `answer` itself — if both fields
+  contain the change record, it appears twice in the posted comment. `answer` holds only the
+  direct answer to the question (Mode B part 1); `chg_proposal` holds the change record and the
+  closing line together (Mode B parts 2 and 3) — see "Output contract" below.
 
 ## Output contract with the calling script
 
@@ -142,10 +155,15 @@ Return a single JSON object, nothing else, no markdown fences:
 ```json
 {
   "mode": "qa" | "proposed_change" | "needs_clarification",
-  "answer": "the Mode A/B/C answer text as described above, in markdown",
-  "chg_proposal": "the full draft change record text, or null unless mode is proposed_change"
+  "answer": "the direct answer to the question only (Mode A/C text as described above, or Mode B part 1 only — never the CHG table or the closing line), in markdown",
+  "chg_proposal": "for proposed_change: the full draft change record (Mode B part 2) followed by the verbatim closing line (Mode B part 3), as one block of markdown. null for qa and needs_clarification."
 }
 ```
+
+The calling script builds the posted comment as `answer`, then (only when `mode` is
+`proposed_change`) a separator, then `chg_proposal`. Nothing in `chg_proposal` should repeat
+anything already said in `answer`, and nothing in `answer` should pre-empt what belongs in
+`chg_proposal`.
 
 Do not write a `STATUS:` line yourself inside `answer` — the calling script derives and prepends
 the machine-readable status line from `mode` on its own, so the two can never drift out of sync
