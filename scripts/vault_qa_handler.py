@@ -13,7 +13,6 @@ Env vars required (all set by the workflow):
   ISSUE_NUMBER       - the issue that triggered this run
 """
 
-import json
 import os
 import re
 import sys
@@ -229,6 +228,43 @@ def count_recent_bot_comments(repo: str, token: str) -> int:
     return sum(1 for c in comments if c["user"]["login"] == BOT_LOGIN)
 
 
+# Forces the model's structured output through the Anthropic API's own JSON parsing instead of
+# asking the model to hand-write a JSON string. The old approach broke whenever the "answer"
+# field legitimately contained a markdown blockquote with double quotes (e.g. citing vault text
+# verbatim) and the model didn't escape them perfectly inside its own JSON text — see the
+# incident that prompted this fix. tool_choice below forces exactly this tool to be called, so
+# there's no plain-text fallback path to fall out of.
+ANSWER_TOOL = {
+    "name": "submit_answer",
+    "description": (
+        "Submit the structured answer to the vault question. Always call this tool exactly "
+        "once with the final answer for this turn — never answer with plain text instead."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "mode": {
+                "type": "string",
+                "enum": ["qa", "proposed_change", "needs_clarification"],
+                "description": "Which of the three skill modes applies to this question.",
+            },
+            "answer": {
+                "type": "string",
+                "description": "The answer to post as the issue comment body (markdown).",
+            },
+            "chg_proposal": {
+                "type": ["string", "null"],
+                "description": (
+                    "A draft CHG proposal in the chg-proposal-template.md format. Only set "
+                    "when mode is 'proposed_change'; null otherwise."
+                ),
+            },
+        },
+        "required": ["mode", "answer"],
+    },
+}
+
+
 def ask_claude(skill_instructions: str, context_text: str, context_labels: list[str],
                 transcript: str, current_question: str) -> dict:
     client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
@@ -252,21 +288,17 @@ def ask_claude(skill_instructions: str, context_text: str, context_labels: list[
         max_tokens=2000,
         system=system_prompt,
         messages=[{"role": "user", "content": user_content}],
+        tools=[ANSWER_TOOL],
+        tool_choice={"type": "tool", "name": "submit_answer"},
     )
-    text = "".join(block.text for block in response.content if block.type == "text").strip()
-    # Defensive cleanup in case the model wraps the JSON in a fence despite instructions not to.
-    if text.startswith("```"):
-        text = text.strip("`")
-        if text.startswith("json"):
-            text = text[4:]
-        text = text.strip()
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        # Fail loud, not silent — an unparsed response should not turn into a bad guess about
-        # what to post.
-        print("ERROR: could not parse Claude's response as JSON:\n", text, file=sys.stderr)
-        raise
+    for block in response.content:
+        if block.type == "tool_use" and block.name == "submit_answer":
+            return block.input
+    # Fail loud, not silent — a missing tool call should not turn into a bad guess about what
+    # to post.
+    print("ERROR: Claude's response did not include a submit_answer tool call:\n",
+          response.content, file=sys.stderr)
+    raise RuntimeError("No submit_answer tool_use block in Claude's response")
 
 
 def main() -> None:
