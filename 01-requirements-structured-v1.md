@@ -2,6 +2,7 @@
 
 **Source(s):** "Community CPR Volunteer Dispatch — Project Brief" (PDF, dated 2026-05-29); "Community CPR — 4-Repo Architecture" diagram (provided by Mohamed, 2026-07-06); Mohamed's kickoff conversation, 2026-07-06 (dispatcher-web example stories, phasing intent)
 **Date structured:** 2026-07-06
+**Last updated:** 2026-07-08 (CHG-001)
 **Produced by:** requirements-structuring skill
 **Status:** Draft — needs human review
 
@@ -74,7 +75,7 @@ Community CPR Volunteer Dispatch is a system that lets a 911/112 dispatcher pin 
 | REQ-N-015 | Units of measurement shall be configurable per country, not hard-coded. | Portability | Must | Brief — "Non-functional stuff" (Portability) | |
 | REQ-N-016 | Country-specific business rules (who is alerted, in what order, at what distance) shall be configurable, not hard-coded. | Portability | Must | Brief — "Non-functional stuff" (Portability), "Volunteer tiers" | Technical approach for this abstraction is an open question — see OQ-005. |
 | REQ-N-017 | Nearby-volunteer search shall return results in sub-second time, including in dense cities. | Performance | Must | Brief — "What the backend needs to do" | "Sub-second" and load conditions not precisely defined — see OQ-007. Related functional requirement: REQ-F-031. |
-| REQ-N-018 | Background location tracking on the volunteer app shall be battery-friendly. | Performance/Usability | Should | Brief — "What the volunteer app needs to do" | Vague term, no measurable definition given — see OQ-008. |
+| REQ-N-018 | Background location tracking on the volunteer app shall be battery-friendly. | Performance/Usability | Must | Brief — "What the volunteer app needs to do"; priority elevated per client confirmation (GitHub issue "Vraag: prioriteit REQ-N-018", SaadiMoh) [CHG-001] | Vague term, no measurable definition given — see OQ-008. OQ-008 remains open and is now more urgent to resolve given Must-level priority. |
 
 ## 4. Constraints
 

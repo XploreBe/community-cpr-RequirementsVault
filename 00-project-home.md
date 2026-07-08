@@ -22,7 +22,7 @@ Phase 1, currently in this vault, is deliberately smaller than the brief's own "
 
 ## Recent changes
 
-*No changes yet*
+- **CHG-001** (2026-07-08) — REQ-N-018 priority elevated from Should to Must (client confirmation) → [[06-change-log]]
 
 Full change history: [[06-change-log]]
 
