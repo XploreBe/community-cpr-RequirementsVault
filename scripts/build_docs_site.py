@@ -27,8 +27,11 @@ EXCLUDE_DIRS = {
     "scripts", "github-sync", "docs-site", "docs_build", "site",
 }
 # Root-level files that aren't vault content meant for the published site.
+# 00-how-to-use.md is about running/maintaining the Obsidian vault and the
+# Claude pipeline itself, not about the project, so it's kept out of the
+# public site (still in the repo for the team).
 EXCLUDE_FILES = {
-    "README.md", "README-vault-qa.md", "CLAUDE.md",
+    "README.md", "README-vault-qa.md", "CLAUDE.md", "00-how-to-use.md",
     ".gitignore", ".DS_Store", "mkdocs.yml",
 }
 
@@ -40,6 +43,11 @@ WIKILINK_RE = re.compile(r"\[\[([^\]]+)\]\]")
 # wikilink pointing at "00-project-home" is aliased to resolve there too.
 HOMEPAGE_SRC = Path("00-project-home.md")
 HOMEPAGE_DST = Path("index.md")
+
+# Where to send links that point at a real file which was deliberately kept
+# off the published site (e.g. 00-how-to-use.md, 00-pipeline-skills/*),
+# instead of leaving them as dead, unclickable text.
+GITHUB_BLOB_BASE = "https://github.com/XploreBe/community-cpr-RequirementsVault/blob/main/"
 
 
 def slugify(text: str) -> str:
@@ -76,7 +84,23 @@ def build_indexes(rel_paths: list[Path]):
     return path_index, basename_index
 
 
-def resolve_target(target: str, current_rel: Path, path_index, basename_index, warnings: list[str]):
+def build_repo_wide_indexes():
+    """Every markdown file in the repo (except .git), included or not.
+    Used only as a fallback so links to intentionally-excluded files (e.g.
+    00-how-to-use.md, 00-pipeline-skills/*) can point to GitHub instead of
+    rendering as dead text."""
+    path_index: dict[str, Path] = {}
+    basename_index: dict[str, list[Path]] = {}
+    for path in ROOT.rglob("*.md"):
+        rel = path.relative_to(ROOT)
+        if ".git" in rel.parts[:-1]:
+            continue
+        path_index[rel.with_suffix("").as_posix().lower()] = rel
+        basename_index.setdefault(rel.stem.lower(), []).append(rel)
+    return path_index, basename_index
+
+
+def resolve_target(target, current_rel, path_index, basename_index, repo_path_index, repo_basename_index, warnings):
     target = target.strip().lstrip("/")
     if target.lower().endswith(".md"):
         target = target[:-3]
@@ -94,15 +118,29 @@ def resolve_target(target: str, current_rel: Path, path_index, basename_index, w
                 f"{current_rel}: ambiguous wikilink '[[{target}]]' matched "
                 f"{len(candidates)} files, picked '{hit}'"
             )
-    if hit is None:
-        warnings.append(f"{current_rel}: could not resolve wikilink '[[{target}]]'")
-        return None
+    if hit is not None:
+        start = current_rel.parent.as_posix()
+        return os.path.relpath(hit.as_posix(), start).replace(os.sep, "/")
 
-    start = current_rel.parent.as_posix()
-    return os.path.relpath(hit.as_posix(), start).replace(os.sep, "/")
+    # Not part of the published site, but does it exist in the repo at all
+    # (e.g. 00-how-to-use.md, a pipeline-skills doc)? Link out to GitHub
+    # instead of rendering dead, unclickable text.
+    excluded_hit = repo_path_index.get(key)
+    if excluded_hit is None and "/" not in target:
+        candidates = repo_basename_index.get(key, [])
+        excluded_hit = candidates[0] if candidates else None
+    if excluded_hit is not None:
+        warnings.append(
+            f"{current_rel}: wikilink '[[{target}]]' points to a file excluded "
+            f"from the site, linked out to GitHub instead"
+        )
+        return GITHUB_BLOB_BASE + excluded_hit.as_posix()
+
+    warnings.append(f"{current_rel}: could not resolve wikilink '[[{target}]]'")
+    return None
 
 
-def convert_wikilinks(text: str, current_rel: Path, path_index, basename_index, warnings: list[str]) -> str:
+def convert_wikilinks(text, current_rel, path_index, basename_index, repo_path_index, repo_basename_index, warnings):
     def replace(match: re.Match) -> str:
         # Wikilinks inside Markdown tables often escape the alias pipe as
         # "\|" so it doesn't get parsed as a table cell separator. Unescape
@@ -123,11 +161,14 @@ def convert_wikilinks(text: str, current_rel: Path, path_index, basename_index, 
             text_out = label or anchor
             return f"[{text_out}](#{slugify(anchor)})"
 
-        href = resolve_target(target, current_rel, path_index, basename_index, warnings)
+        href = resolve_target(
+            target, current_rel, path_index, basename_index,
+            repo_path_index, repo_basename_index, warnings,
+        )
         text_out = label or target
         if href is None:
             return f"**{text_out}**"
-        if anchor:
+        if anchor and not href.startswith("http"):
             href = f"{href}#{slugify(anchor)}"
         return f"[{text_out}]({href})"
 
@@ -141,6 +182,7 @@ def main() -> None:
 
     rel_paths = collect_markdown_files()
     path_index, basename_index = build_indexes(rel_paths)
+    repo_path_index, repo_basename_index = build_repo_wide_indexes()
     warnings: list[str] = []
 
     for rel in rel_paths:
@@ -149,7 +191,10 @@ def main() -> None:
         dst = BUILD_DIR / effective
         dst.parent.mkdir(parents=True, exist_ok=True)
         content = src.read_text(encoding="utf-8")
-        content = convert_wikilinks(content, effective, path_index, basename_index, warnings)
+        content = convert_wikilinks(
+            content, effective, path_index, basename_index,
+            repo_path_index, repo_basename_index, warnings,
+        )
         dst.write_text(content, encoding="utf-8")
 
     nav_dir = ROOT / "docs-site"
