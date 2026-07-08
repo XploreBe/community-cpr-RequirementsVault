@@ -200,6 +200,17 @@ def run_agent_loop(client: Anthropic, system_prompt: str, user_message: str) -> 
             system=system_prompt,
             messages=messages,
             tools=TOOLS,
+            # Automatic prompt caching: the system prompt (the whole change-management SKILL.md)
+            # and the tool definitions are identical on every turn, and the growing message
+            # history only ever gets appended to, never rewritten -- exactly the multi-turn
+            # pattern automatic caching is built for. This matters for more than cost: per
+            # Anthropic's docs, cache_read_input_tokens do NOT count towards the per-minute input
+            # token rate limit for this model, only genuinely new (uncached) input tokens do. The
+            # 429 we hit on the very first live run was an input-tokens-per-minute limit, driven
+            # almost entirely by resending the same SKILL.md and already-read file contents on
+            # every turn -- this cuts that repeated cost to ~10% of its token price and takes it
+            # out of the rate-limit calculation entirely from the second turn onward.
+            cache_control={"type": "ephemeral"},
         )
         messages.append({"role": "assistant", "content": response.content})
 
