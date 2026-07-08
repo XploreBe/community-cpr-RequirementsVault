@@ -67,9 +67,10 @@ A tester must be able to write a test case from each criterion without asking a 
 7. **Record dependencies** as links; keep stories as independent as possible.
 8. **Write spikes** for genuine unknowns (open technical questions, high-risk approaches) instead of pretending they're normal stories.
 9. **Flag anything needing new scope back to the requirements/scope step** — do not invent it as a story.
-10. **Add backlog metadata** — type, epic link, traces-to (and a grounding tag where the story rests on an assumption or inference), and a status from the vocabulary: New/Backlog (ready), Ready (conditional — assumption stated), or Not Ready (blocked — reason). Check each story against the Definition of Ready.
+10. **Add backlog metadata** — type, epic link, traces-to (and a grounding tag where the story rests on an assumption or inference), and a status from the vocabulary: New/Backlog (ready), Ready (conditional — assumption stated), or Not Ready (blocked — reason). Check each story against the Definition of Ready. Also set **Delivery status** to "Not started" — this is a separate field from Status: Status is BA-readiness (is this ready to be picked up), Delivery status is actual build progress (Not started / In Progress / Done), and it is owned by the delivery team from here on, not by this skill. Always initialise it to "Not started"; never set it to "In Progress" or "Done" yourself, even if a story looks straightforward or its acceptance criteria seem obviously satisfiable.
 11. **Propose a suggested build order** for the phase: enablers and spikes first, then stories in dependency order, then by value.
 12. **Fill the template** in `assets/product-backlog-template.md` exactly.
+13. **If `00-project-home.md` already exists and has a "Current status" section with a backlog-readiness table** (Ready / Ready (conditional) / Not Ready / Won't counts per repo — e.g. from an earlier phase's pipeline run), update that table to include this run's items too, so it still matches the full backlog across all phases. Only touch the readiness counts, never the Delivery status column.
 
 ## Definition of Ready (per story)
 
@@ -84,6 +85,7 @@ A story is Ready for a sprint when: it has a clear role and benefit; testable ac
 - Acceptance criteria that quietly decide an open question. Mark the story blocked or state the assumption.
 - A benefit clause that just restates the capability ("so that I can [the capability again]"), describes a system outcome ("so that it gets saved"), or gives a vague consequence ("so that nothing goes wrong") instead of the user's real reason.
 - Fat stories that can't fit a sprint. Split them.
+- Confusing Status (BA-readiness) with Delivery status (build progress), or setting Delivery status to anything other than "Not started" for a newly written item. Delivery status belongs to the delivery team from the moment a story is added.
 
 ## Example
 

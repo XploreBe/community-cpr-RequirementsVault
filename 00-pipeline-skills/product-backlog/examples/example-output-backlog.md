@@ -11,6 +11,7 @@
 - **Size:** S / M / L — relative, provisional (confirm in refinement)
 - **Type:** Story / Spike / Enabler
 - **Status:** New · Backlog · Not Ready (reason)
+- **Delivery status:** Not started · In Progress · Done — owned by the delivery team, always starts at "Not started"
 
 ## Epics
 
@@ -35,6 +36,7 @@
 - **Epic:** EPIC-1 · **Traces to:** REQ-F-001
 - **Depends on / Blocked by:** —
 - **Status:** New
+- **Delivery status:** Not started
 
 ### US-002 — Find volunteers near the patient
 - **Type:** Story
@@ -46,6 +48,7 @@
 - **Epic:** EPIC-1 · **Traces to:** REQ-F-002
 - **Depends on / Blocked by:** **Blocked** — requires a volunteer registry + sign-up (volunteers, location, availability), which is not in the requirements (see "Items sent back").
 - **Status:** Not Ready — blocked on missing registry scope.
+- **Delivery status:** Not started
 
 ### US-003 — Alert nearby volunteers
 - **Type:** Story
@@ -59,6 +62,7 @@
 - **Epic:** EPIC-1 · **Traces to:** REQ-F-003
 - **Depends on / Blocked by:** US-002 (needs the nearby set)
 - **Status:** New
+- **Delivery status:** Not started
 
 ### US-004 — Volunteer accepts an alert
 - **Type:** Story
@@ -71,6 +75,7 @@
 - **Epic:** EPIC-1 · **Traces to:** REQ-F-004
 - **Depends on / Blocked by:** US-003
 - **Status:** New
+- **Delivery status:** Not started
 - **Notes:** Whether an explicit "decline" action is also needed is open (OQ-04). This story covers accept only; decline would be a separate story once decided — not assumed here.
 
 ### US-005 — Navigate to the scene
@@ -83,6 +88,7 @@
 - **Epic:** EPIC-1 · **Traces to:** REQ-F-005 · **Constraint:** CON-002
 - **Depends on / Blocked by:** US-004
 - **Status:** New
+- **Delivery status:** Not started
 
 ### US-006 — Stand responders down
 - **Type:** Story
@@ -94,6 +100,7 @@
 - **Epic:** EPIC-1 · **Traces to:** REQ-F-008
 - **Depends on / Blocked by:** US-003
 - **Status:** New
+- **Delivery status:** Not started
 
 ### SPIKE-001 — How to deliver the alert within ~5 seconds, 95% of the time
 - **Type:** Spike (timeboxed)
@@ -101,6 +108,7 @@
 - **Done when:** a documented recommendation and feasibility finding exist for the team to decide on.
 - **Priority:** Must · **Phase/Sprint:** Phase 1 (early)
 - **Traces to:** REQ-N-001, OQ-03
+- **Delivery status:** Not started
 - **Notes:** Written as a spike because the approach is unproven and the exact target (OQ-03) isn't confirmed; not a normal story.
 
 ---

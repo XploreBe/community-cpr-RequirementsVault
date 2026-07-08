@@ -11,6 +11,23 @@ A 911/112 dispatcher pins a cardiac-arrest patient on a map, the system finds ne
 
 Phase 1, currently in this vault, is deliberately smaller than the brief's own "MVP" section: a walking skeleton per repo — no login, mocked data, no real cross-repo integration — so the team has something working to build on before tackling auth, real geospatial matching, real push delivery, and the security/privacy/portability requirements.
 
+## Current status
+
+**Phase 1** (dispatcher-web, volunteer-app, backend-api walking skeleton) is fully structured, scoped, backlogged, and spec'd. **Phase 2** (real login, real backend, real alerting, security/privacy/portability) is scoped by theme in [[02-scope-and-context-v1|scope & context]] §4 but not yet broken into stories.
+
+**Backlog readiness (Phase 1)** — this table is kept accurate by change-management whenever a CHG changes a story's status, same as the rest of this page:
+
+| Repo | Items | Ready | Ready (conditional) | Not Ready | Won't |
+|------|------:|------:|---------------------:|----------:|------:|
+| dispatcher-web | 6 | 6 | 0 | 0 | 0 |
+| volunteer-app | 6 | 4 | 2 | 0 | 0 |
+| backend-api | 3 | 3 | 0 | 0 | 0 |
+| **Total** | **15** | **13** | **2** | **0** | **0** |
+
+No Phase 1 story or enabler is blocked on an open question right now — the 2 "conditional" items rest on a stated assumption, not a block (see [[#Phase 1 blockers|Phase 1 blockers]] below).
+
+**Delivery progress** — what the team is actually building right now — is tracked directly in the backlog, not duplicated here: every story/enabler in [[03-product-backlog-v1|the product backlog]] has a **Delivery status** field (Not started / In Progress / Done) that the team updates by hand as work happens. That keeps this page from ever showing a stale count. As of the last pipeline/CHG run, every Phase 1 item is still "Not started."
+
 ## Documents
 
 - [[01-requirements-structured-v1|Structured requirements]] — REQ-F, REQ-N, CON, OQ, AS extracted from the project brief and the architecture diagram.
