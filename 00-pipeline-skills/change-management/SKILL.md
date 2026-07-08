@@ -153,6 +153,14 @@ In `00-project-home.md`, add a line to a "Recent changes" section (create it if 
 - **CHG-xxx** (YYYY-MM-DD) — [one-line summary] → [[06-change-log]]
 ```
 
+If `00-project-home.md` has a "Current status" section with a backlog-readiness table (Ready / Ready (conditional) / Not Ready / Won't counts per repo), and this run changed any backlog item's **Status** (BA-readiness) field, recompute that table's counts so it still matches the backlog. This applies whenever any of the following happened this run:
+- Step 5 (OQ resolved): a story moved from Not Ready to Ready / Ready (conditional).
+- Step 7 (requirement removed): a story was marked Won't.
+- Any other step that changed a story's Status field.
+Step 6 (new requirement) does not need this — it deliberately does not create a story or change any existing item's status, so the table stays correct as-is. If the table has no "Won't" column yet (an older run), add one rather than dropping the count.
+
+Never touch the **Delivery status** column or field anywhere in this table or the backlog: that one is owned by the delivery team, not this skill, and is intentionally left out of every count this skill maintains.
+
 ---
 
 ## Output summary
@@ -173,3 +181,4 @@ At the end, produce a brief plain-text summary in chat:
 - **Rewriting history.** Old values are struck through or noted — never deleted. The original text must remain readable in the document.
 - **Acting on an ambiguous change record.** If "old value" and "new value" are unclear, stop and ask. A vague input produces a cascade of wrong edits that are expensive to undo.
 - **Changing the traceability matrix IDs.** REQ-F-xxx, US-xxx, CHG-xxx — these IDs are permanent once assigned. A changed requirement keeps its ID; only its content changes.
+- **Touching a story's Delivery status field.** That field (Not started / In Progress / Done) belongs to the delivery team, not this skill. Update Status (BA-readiness) as the change requires; never set or infer Delivery status, even when a change makes a story's completion seem obvious.

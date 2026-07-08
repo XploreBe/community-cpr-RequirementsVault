@@ -7,6 +7,9 @@ Priority: MoSCoW (Must / Should / Could / Won't), carried from requirements/scop
 Size: S / M / L (relative, provisional — final pointing happens with the team).
 Type: Story / Spike / Enabler.
 Status: New / Backlog / Not Ready (with reason).
+Delivery status: always start new items at "Not started" -- this field is owned and updated by
+the delivery team, not by this skill or any other pipeline step. Never infer or advance it
+yourself (e.g. never mark something "Done" because its acceptance criteria look satisfied).
 Acceptance criteria: Given/When/Then and/or rule checklist. Always include edge/negative cases.
 A tester must be able to write a test case from each criterion with no follow-up question.
 -->
@@ -23,7 +26,8 @@ A tester must be able to write a test case from each criterion with no follow-up
 - **Priority:** MoSCoW (Must / Should / Could / Won't)
 - **Size:** S / M / L — relative, provisional (confirm in refinement)
 - **Type:** Story / Spike / Enabler
-- **Status:** New · Backlog · Ready (conditional — assumption stated) · Not Ready (reason)
+- **Status:** New · Backlog · Ready (conditional — assumption stated) · Not Ready (reason) — this is BA-readiness (is it ready to be picked up), not delivery progress
+- **Delivery status:** Not started · In Progress · Done — manually maintained by the delivery team as work actually happens; always starts at "Not started" when a story is added, and this skill never advances it on its own
 - **Grounding:** Direct (traces to a stated requirement) · Derived (rests on an assumption/inference — say which)
 
 ## Epics
@@ -48,6 +52,7 @@ A tester must be able to write a test case from each criterion with no follow-up
 - **Grounding:** Direct / Derived (if Derived: which assumption or inference)
 - **Depends on / Blocked by:** [US-xxx / external / —]
 - **Status:** [New / Ready (conditional) / Not Ready — reason]
+- **Delivery status:** Not started
 - **Notes:** [assumptions, open questions this rests on]
 
 ### SPIKE-001 — [question to resolve]
@@ -56,6 +61,7 @@ A tester must be able to write a test case from each criterion with no follow-up
 - **Done when:** [a recommendation/decision is documented]
 - **Priority:** [MoSCoW] · **Phase/Sprint:** [phase]
 - **Traces to:** [REQ-IDs / OQ-xx]
+- **Delivery status:** Not started
 
 ---
 

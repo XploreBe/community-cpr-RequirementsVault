@@ -11,7 +11,8 @@
 - **Priority:** MoSCoW (Must / Should / Could / Won't)
 - **Size:** S / M / L — relative, provisional (confirm in refinement)
 - **Type:** Story / Spike / Enabler
-- **Status:** New · Backlog · Ready (conditional — assumption stated) · Not Ready (reason)
+- **Status:** New · Backlog · Ready (conditional — assumption stated) · Not Ready (reason) — BA-readiness, not delivery progress
+- **Delivery status:** Not started · In Progress · Done — manually maintained by the delivery team; not touched by any pipeline skill
 - **Grounding:** Direct (traces to a stated requirement) · Derived (rests on the Phase 1 walking-skeleton simplification agreed with Mohamed — see 02-scope-and-context-v1.md §3 — or another stated assumption)
 
 This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later items are listed by theme in 02-scope-and-context-v1.md §4 but not yet broken into stories — that is a follow-up backlog pass once Phase 1 ships and the open questions blocking Phase 2 (OQ-001, OQ-003, OQ-004, OQ-005, OQ-011 — see 02-scope-and-context-v1.md §9) are resolved.
@@ -43,6 +44,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Grounding:** Derived — the generic "incident" entity with a `type` field is a Phase 1 simplification agreed with Mohamed (02-scope-and-context-v1.md §3), not literally described in the brief, which frames location-pinning as part of a single live cardiac-arrest dispatch rather than a general case record.
 - **Depends on / Blocked by:** —
 - **Status:** Ready
+- **Delivery status:** Not started
 
 ### US-002 — View incidents
 - **Type:** Story
@@ -56,6 +58,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Grounding:** Derived — a multi-incident overview isn't a capability the brief states explicitly (it describes a single live dispatch, not a case list); this is Mohamed's Phase 1 framing (chat, 2026-07-06).
 - **Depends on / Blocked by:** US-001 (needs incidents to exist)
 - **Status:** Ready
+- **Delivery status:** Not started
 
 ### US-003 — View incident detail
 - **Type:** Story
@@ -69,6 +72,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Grounding:** Derived — same Phase 1 framing as US-002.
 - **Depends on / Blocked by:** US-001
 - **Status:** Ready
+- **Delivery status:** Not started
 
 ### US-004 — Update incident
 - **Type:** Story
@@ -83,6 +87,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Grounding:** Derived — the open/in progress/resolved status enum is Mohamed's Phase 1 simplification of REQ-F-010's fuller live-status concept (notified/accepted/declined/en route/arrived/stood down), which is Phase 2.
 - **Depends on / Blocked by:** US-001
 - **Status:** Ready
+- **Delivery status:** Not started
 
 ### US-005 — Cancel / resolve incident
 - **Type:** Story
@@ -97,6 +102,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Grounding:** Derived — REQ-F-011's "stand down" concept also notifies volunteers, which is out of scope in Phase 1 (no real alerting yet); this story only closes the record.
 - **Depends on / Blocked by:** US-004 (uses the same status field)
 - **Status:** Ready
+- **Delivery status:** Not started
 
 ### US-006 — View volunteers
 - **Type:** Story
@@ -110,6 +116,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Grounding:** Direct
 - **Depends on / Blocked by:** —
 - **Status:** Ready
+- **Delivery status:** Not started
 
 ---
 
@@ -128,6 +135,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Grounding:** Direct
 - **Depends on / Blocked by:** —
 - **Status:** Ready (conditional — scoped under OQ-001's provisional tier list; final breakdown may require rework)
+- **Delivery status:** Not started
 
 ### US-102 — View an incoming alert
 - **Type:** Story
@@ -141,6 +149,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Grounding:** Derived — Phase 1 simplification; real push mechanics deferred to Phase 2.
 - **Depends on / Blocked by:** Loosely depends on US-101 for a volunteer identity to attach the mocked alert to — not a hard blocker since Phase 1 data is mocked.
 - **Status:** Ready
+- **Delivery status:** Not started
 
 ### US-103 — Accept or decline an alert
 - **Type:** Story
@@ -154,6 +163,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Grounding:** Direct
 - **Depends on / Blocked by:** US-102
 - **Status:** Ready
+- **Delivery status:** Not started
 
 ### US-104 — Navigate to the scene
 - **Type:** Story
@@ -167,6 +177,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Grounding:** Direct (for the capability); the specific provider choice is conditional.
 - **Depends on / Blocked by:** US-103
 - **Status:** Ready (conditional — scoped under OQ-006's Google Maps assumption)
+- **Delivery status:** Not started
 
 ### US-105 — CPR/AED reference
 - **Type:** Story
@@ -179,6 +190,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Grounding:** Direct
 - **Depends on / Blocked by:** —
 - **Status:** Ready
+- **Delivery status:** Not started
 
 ### US-106 — Post-event check-in
 - **Type:** Story
@@ -192,6 +204,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Grounding:** Direct
 - **Depends on / Blocked by:** US-103
 - **Status:** Ready
+- **Delivery status:** Not started
 
 ---
 
@@ -203,6 +216,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Done when:** the repository builds and runs with the six module boundaries in place and a health-check endpoint responds.
 - **Priority:** Must · **Phase/Sprint:** Phase 1 (first)
 - **Traces to:** CON-003
+- **Delivery status:** Not started
 
 ### ENABLER-002 — Basic incident CRUD endpoints
 - **Type:** Enabler
@@ -211,6 +225,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Priority:** Must · **Phase/Sprint:** Phase 1
 - **Traces to:** REQ-F-002, REQ-F-003, REQ-F-004, REQ-F-005, REQ-F-010 (simplified), REQ-F-011, REQ-F-012 (simplified) — Derived, same Phase 1 framing as EPIC-1.
 - **Depends on / Blocked by:** ENABLER-001
+- **Delivery status:** Not started
 
 ### ENABLER-003 — Basic volunteer read endpoint
 - **Type:** Enabler
@@ -219,6 +234,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
 - **Priority:** Should · **Phase/Sprint:** Phase 1
 - **Traces to:** REQ-F-035 (partial)
 - **Depends on / Blocked by:** ENABLER-001
+- **Delivery status:** Not started
 
 ---
 
