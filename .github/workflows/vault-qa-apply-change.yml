@@ -1,0 +1,43 @@
+name: Vault Q&A — Apply Approved Change
+
+# Fires only when a human with write/triage access to this repo adds the 'approved' label to
+# an issue that already carries 'status:possible-change'. Adding a label requires that
+# permission level, so -- unlike vault-qa.yml's Q&A workflow, which any commenter can trigger
+# -- this cannot be set off by an arbitrary external commenter or agent. That's the deliberate
+# approval gate: vault-qa can only ever *propose* a change; this workflow is what actually
+# applies one, and only after a human with real repo access says so.
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  issues: write         # to read/post on the originating issue
+  contents: write       # to create a branch and commit the applied change
+  pull-requests: write  # to open the review PR
+
+jobs:
+  apply-change:
+    if: |
+      github.event.label.name == 'approved' &&
+      contains(github.event.issue.labels.*.name, 'status:possible-change')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout vault
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install anthropic requests
+
+      - name: Apply the approved change
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          BASE_BRANCH: ${{ github.event.repository.default_branch }}
+        run: python scripts/apply_change_handler.py
