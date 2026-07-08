@@ -8,6 +8,10 @@
 - `.github/workflows/vault-qa.yml` — de trigger, inclusief follow-up via comments.
 - `scripts/vault_qa_handler.py` — het script dat de skill uitvoert, op de issue reageert, en een
   globale rate limit afdwingt.
+- `.github/workflows/vault-qa-apply-change.yml` en `scripts/apply_change_handler.py` — optioneel,
+  losstaand van de Q&A-flow hierboven: past een door jou goedgekeurd `possible-change`-voorstel
+  daadwerkelijk toe via change-management, en opent daar een PR voor. Zie de eigen sectie
+  hieronder, "Een stap verder: automatisch een PR na goedkeuring."
 
 ## Gebouwd met agents als vragenstellers in het achterhoofd
 
@@ -31,7 +35,8 @@ info nodig hebben. Twee dingen zijn daarom expliciet ingebouwd, niet later toege
 2. Maak in GitHub een label aan genaamd `vault-question` (Settings → Labels). De vier
    triage-labels (`status:answered`, `status:possible-change`, `status:needs-clarification`,
    `status:rate-limited`) hoef je niet zelf aan te maken, het script maakt ze zelf aan bij eerste
-   gebruik als ze nog niet bestaan — je kan ze daarna wel zelf een kleur geven.
+   gebruik als ze nog niet bestaan — je kan ze daarna wel zelf een kleur geven. Wil je ook de
+   apply-change-workflow gebruiken, maak dan ook een label `approved` aan.
 3. Voeg een repo secret toe: Settings → Secrets and variables → Actions → New repository secret
    → naam `ANTHROPIC_API_KEY`, waarde je API key. `GITHUB_TOKEN` heb je niet zelf nodig aan te
    maken, die levert GitHub Actions automatisch.
@@ -74,11 +79,51 @@ info nodig hebben. Twee dingen zijn daarom expliciet ingebouwd, niet later toege
 
 ## Wat dit NIET doet, expliciet
 
+Dit geldt voor de Q&A-flow (`vault-qa.yml` / `vault_qa_handler.py`) — de apply-change-flow
+hieronder werkt bewust anders en heeft een eigen, groter permissieprofiel.
+
 - Het wijzigt nooit een vaultbestand. Alleen leesrechten op de repo, schrijfrechten alleen op
   issues/comments/labels.
 - Het sluit nooit een issue, en het kent nooit automatisch een echt CHG-nummer toe.
 - Het beantwoordt vervolgvragen via nieuwe comments op een reeds gelabeld issue (zie hierboven) —
   maar niet via edits aan een oud comment, en niet over meerdere issues heen.
+
+## Een stap verder: automatisch een PR na goedkeuring
+
+Optioneel, en volledig los van de Q&A-flow: als je een `status:possible-change`-issue goedkeurt,
+kan een tweede workflow het voorstel daadwerkelijk toepassen en een PR openen, zodat jij niet
+zelf de change-record handmatig hoeft over te tikken naar change-management.
+
+**Trigger:** jij (of iemand anders met schrijftoegang tot deze repo) voegt het label `approved`
+toe aan een issue dat al `status:possible-change` heeft. Bewust een label, geen comment of
+reactie — het toevoegen van een label kan alleen door iemand met repo-schrijfrechten, dus dit kan
+nooit door een willekeurige externe commenter of agent getriggerd worden, in tegenstelling tot de
+Q&A-flow die wél door iedereen die mag reageren gestart kan worden.
+
+**Wat er dan gebeurt:**
+1. Het script controleert dat het issue nog steeds `status:possible-change` draagt, en zoekt de
+   laatste `STATUS: proposed_change`-comment van de bot op als het voorstel om toe te passen.
+2. Het kent het eerstvolgende echte `CHG-xxx`-nummer toe, gebaseerd op het hoogste nummer dat al
+   in `06-change-log.md` staat.
+3. Claude draait de `change-management`-skill als een agent met precies drie tools: bestand lezen,
+   bestand chirurgisch bewerken (uniek-match replace, net als hoe ik zelf bewerk), en "klaar"
+   melden met een samenvatting. Er is geen "nieuw bestand aanmaken"-tool en geen shell-toegang.
+4. Elke lees/schrijf-poging wordt in code gecontroleerd tegen exact de bestanden die
+   change-management mag aanraken (`01/02/03/05/06-*.md`, `00-project-home.md`, bestaande
+   bestanden onder `04-speckit-specs/`) — niet alleen in de instructietekst, maar afgedwongen door
+   de tool zelf. Alles daarbuiten wordt geweigerd.
+5. Vóór er iets gecommit wordt, checkt het script onafhankelijk via `git status` nog een keer of
+   alleen toegestane bestanden zijn veranderd. Staat er iets anders bij (zou niet moeten kunnen
+   gebeuren gezien punt 4, maar het is een tweede, onafhankelijke controle), dan stopt het zonder
+   te committen, pushen, of een PR te openen.
+6. Bij succes: een nieuwe branch (`chg/chg-xxx`), een commit, een PR naar de standaardbranch, en
+   een comment terug op het originele issue met een link naar die PR.
+7. **Er wordt nooit automatisch gemerged, en het originele issue wordt nooit gesloten.** Jij
+   beoordeelt de PR-diff zoals je dat bij elke andere PR zou doen.
+
+Rondt de agent niet binnen 40 tool-aanroepen af (bijvoorbeeld omdat de wijziging te complex is om
+in één keer goed te doen), dan stopt het script met een duidelijke `STATUS:
+apply_change_failed`-comment, zonder branch, zonder PR — geen halfslachtig resultaat.
 
 ## Bekende beperkingen (eerlijk gezegd)
 
@@ -107,3 +152,16 @@ info nodig hebben. Twee dingen zijn daarom expliciet ingebouwd, niet later toege
 - **`labeled`/`edited`/`created`, niet `opened`.** Bewust: dit voorkomt dat elke issue die per
   ongeluk zonder label wordt geopend meteen een API-call triggert. Bijeffect: als iemand het label
   meteen bij het openen zet, telt dat als een "labeled" event en werkt het gewoon.
+- **Apply-change heeft een veel groter permissieprofiel dan de Q&A-flow.** `contents: write` en
+  `pull-requests: write`, tegenover alleen `issues: write` voor gewone vragen. Dat is nodig om een
+  branch te kunnen aanmaken en een PR te openen, maar het is wel een bewust grotere aanvalsoppervlakte
+  — vandaar dat de trigger een label-toevoeging is (vereist repo-schrijfrechten), niet iets dat een
+  willekeurige commenter kan doen.
+- **CHG-nummering bij apply-change kan botsen bij gelijktijdige goedkeuringen.** Het volgende
+  nummer wordt bepaald door het hoogste `CHG-xxx` in `06-change-log.md` op de standaardbranch te
+  lezen. Keur je twee `possible-change`-issues goed vóór de eerste PR gemerged is, dan kunnen beide
+  runs hetzelfde volgende nummer claimen — je ziet dat vanzelf terug als een conflict wanneer je de
+  tweede PR probeert te mergen na de eerste, maar het is geen automatisch opgeloste botsing. Voor
+  normaal gebruik (goedkeuren, mergen, dan de volgende) is dit geen probleem; bij veel gelijktijdige
+  goedkeuringen zou je dit willen oplossen met een soort nummer-reservering, bewust niet gebouwd
+  voor deze eerste versie.
