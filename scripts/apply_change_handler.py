@@ -285,61 +285,84 @@ def find_latest_proposal_comment(comments: list[dict]) -> str | None:
     return None
 
 
-# The literal markdown field headers from 00-pipeline-skills/vault-qa/assets/chg-proposal-template.md,
-# in the order they appear in that template. Used to mechanically pull the proposal's fields out
-# of the bot's comment instead of asking the model to eyeball a translation into
-# change-record-template.md's field names -- see parse_chg_proposal() below.
-CHG_PROPOSAL_FIELDS = [
-    ("affected_item", r"\*\*Affected ID\(s\):\*\*"),
-    ("old_value", r"\*\*Current value[^*]*:\*\*"),
-    ("new_value", r"\*\*Proposed new value:\*\*"),
-    ("reason", r"\*\*Reason given:\*\*"),
-    ("source", r"\*\*Source:\*\*"),
-    ("requested_by", r"\*\*Requested by:\*\*"),
-]
+# Forces a small, dedicated tool call to pull change-record-template.md's fields out of
+# vault-qa's draft proposal. This replaced an earlier regex parser that assumed the model would
+# reproduce chg-proposal-template.md's exact bolded-field-per-line layout every time -- in a
+# live run it instead wrote the same information as a Markdown table with different field names
+# ("Affected IDs" instead of "Affected ID(s)", no separate "Requested by"), which a literal
+# header match couldn't handle at all. Forcing a tool call is the same fix that already solved
+# vault-qa's JSON-crash bug (ANSWER_TOOL in vault_qa_handler.py): it's robust to whatever
+# markdown shape surrounds the fields -- a table, bullets, bolded lines, prose -- while still
+# guaranteeing a clean, structured result, instead of leaving the mapping as one instruction
+# buried inside a much longer agentic system prompt (the original problem) or assuming a rigid
+# text format the model doesn't reliably produce (this module's first attempt at a fix).
+CHG_FIELD_EXTRACTION_TOOL = {
+    "name": "extract_chg_fields",
+    "description": (
+        "Extract change-record fields from vault-qa's draft change proposal below, regardless "
+        "of whether it's written as a Markdown table, bolded field labels, bullet points, or "
+        "prose. Always call this exactly once with your best-effort extraction of the meaning "
+        "-- never answer with plain text instead, and never leave a field empty; if a value "
+        "genuinely isn't stated, write 'not specified' rather than omitting it."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "affected_item": {
+                "type": "string",
+                "description": "The affected requirement/story/OQ ID(s), e.g. 'REQ-N-018, OQ-008'.",
+            },
+            "old_value": {
+                "type": "string",
+                "description": "The current vault content/value that would change, as quoted or summarized in the proposal.",
+            },
+            "new_value": {
+                "type": "string",
+                "description": "The proposed new value or content.",
+            },
+            "reason": {
+                "type": "string",
+                "description": "Why this change is being proposed.",
+            },
+            "triggered_by": {
+                "type": "string",
+                "description": "Where this proposal came from -- the issue, comment, or person that triggered it.",
+            },
+        },
+        "required": ["affected_item", "old_value", "new_value", "reason", "triggered_by"],
+    },
+}
 
 
-def parse_chg_proposal(proposal_text: str) -> dict:
-    """Extract chg-proposal-template.md's fields out of vault-qa's Mode B comment by their
-    literal markdown headers, and return them already renamed to change-record-template.md's
-    field names (affected_item, old_value, new_value, reason -- source/requested_by are kept
-    under their own names since change-record-template.md's 'Triggered by' is a composite of
-    both). This used to be done by asking the model in the prompt to "translate it yourself,
-    the fields map directly" -- that's fine as an instruction but gave no guarantee the model
-    actually applied it correctly on every run. Doing the mechanical rename in code means the
-    only thing left for the model to judge is genuinely judgment-based (Change type, whether an
-    OQ is resolved), not plain field renaming.
-
-    Raises ValueError naming exactly which header is missing, so a drift in
-    chg-proposal-template.md's format shows up as a loud, specific failure instead of the model
-    silently guessing at a mapping.
-    """
-    matches = []
-    for key, pattern in CHG_PROPOSAL_FIELDS:
-        m = re.search(pattern, proposal_text)
-        if not m:
-            raise ValueError(f"chg-proposal-template.md field header not found: {pattern!r}")
-        matches.append((key, m.start(), m.end()))
-    matches.sort(key=lambda item: item[1])
-
-    fields = {}
-    for i, (key, _, end) in enumerate(matches):
-        if i + 1 < len(matches):
-            next_start = matches[i + 1][1]
-        else:
-            # The last field (Requested by) has no following header to bound it, so it would
-            # otherwise capture the template's trailing "---\n**Next step:** ..." boilerplate
-            # too. The template's closing horizontal rule marks the real end of the field data.
-            rule = re.search(r"\n\s*-{3,}\s*\n", proposal_text[end:])
-            next_start = end + rule.start() if rule else len(proposal_text)
-        raw = proposal_text[end:next_start].strip()
-        # Current value / Proposed new value are blockquoted in the template ("> ...") --
-        # strip that marker so the extracted value is just the text itself.
-        raw = "\n".join(
-            line[2:] if line.startswith("> ") else line for line in raw.splitlines()
-        ).strip()
-        fields[key] = raw
-    return fields
+def extract_chg_fields(client: Anthropic, proposal_text: str) -> dict:
+    """Runs one small, forced tool call (no agentic loop, no file access) to map vault-qa's
+    draft proposal onto change-record-template.md's fields. Raises ValueError -- with the
+    model's actual tool call missing or a required field left empty -- rather than silently
+    proceeding with a bad or incomplete mapping."""
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=1000,
+        system=(
+            "You extract structured fields from a draft change proposal written by the "
+            "vault-qa skill. Its exact formatting varies from run to run -- a Markdown table, "
+            "bolded field labels, bullet points -- extract the meaning of each field, not a "
+            "literal string match against any particular template."
+        ),
+        messages=[{"role": "user", "content": f"Draft change proposal:\n\n{proposal_text}"}],
+        tools=[CHG_FIELD_EXTRACTION_TOOL],
+        tool_choice={"type": "tool", "name": "extract_chg_fields"},
+    )
+    for block in response.content:
+        if block.type == "tool_use" and block.name == "extract_chg_fields":
+            fields = block.input
+            missing = [
+                k for k in ("affected_item", "old_value", "new_value", "reason", "triggered_by")
+                if not fields.get(k)
+            ]
+            if missing:
+                raise ValueError(f"extraction returned an empty value for: {missing}")
+            return fields
+    raise ValueError("Claude's response did not include an extract_chg_fields tool call")
 
 
 def run_git(*args: str) -> None:
@@ -396,16 +419,16 @@ def main() -> None:
         )
         return
 
+    client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+
     try:
-        mapped = parse_chg_proposal(proposal_text)
-    except ValueError as e:
+        mapped = extract_chg_fields(client, proposal_text)
+    except Exception as e:
         post_comment(
             repo, issue_number, token,
-            f"STATUS: apply_change_failed\n\nCould not parse the change proposal into "
-            f"change-record fields: {e}\n\nThis usually means "
-            f"00-pipeline-skills/vault-qa/assets/chg-proposal-template.md's format has drifted "
-            f"from what apply_change_handler.py expects to parse. No action taken -- this needs "
-            f"a manual look at the template or the parser, not a retry.",
+            f"STATUS: apply_change_failed\n\nCould not extract change-record fields from the "
+            f"proposal comment: {e}\n\nNo action taken -- worth a look before retrying (removing "
+            f"and re-adding the `approved` label will try again).",
         )
         return
 
@@ -437,7 +460,7 @@ def main() -> None:
         f"Old value: {mapped['old_value']}\n"
         f"New value: {mapped['new_value']}\n"
         f"Reason: {mapped['reason']}\n"
-        f"Triggered by: {mapped['source']} (requested by {mapped['requested_by']})\n\n"
+        f"Triggered by: {mapped['triggered_by']}\n\n"
         "Two fields genuinely need your judgment, not mechanical mapping, so decide these "
         "yourself from context: Change type (e.g. 'Requirement modified', 'Priority change', "
         "'New requirement', 'Requirement removed'), and Resolves OQ (only fill in an OQ-xxx if "
@@ -449,7 +472,6 @@ def main() -> None:
         f"{proposal_text}\n"
     )
 
-    client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
     result = run_agent_loop(client, system_prompt, user_message)
 
     if result is None:
