@@ -1,0 +1,11 @@
+nav:
+  - Home: index.md
+  - Requirements & Scope:
+      - 01-requirements-structured-v1.md
+      - 02-scope-and-context-v1.md
+      - 03-product-backlog-v1.md
+  - Technical:
+      - 04-speckit-specs
+      - 05-traceability-matrix.md
+      - 06-change-log.md
+  - ...

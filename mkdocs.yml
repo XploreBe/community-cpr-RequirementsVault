@@ -1,0 +1,40 @@
+site_name: Community CPR Volunteer Dispatch — Requirements & Docs
+site_description: Requirements, scope, backlog, specs and traceability for the Community CPR Volunteer Dispatch project.
+site_url: https://xplorebe.github.io/community-cpr-RequirementsVault/
+repo_url: https://github.com/XploreBe/community-cpr-RequirementsVault
+repo_name: XploreBe/community-cpr-RequirementsVault
+
+# Populated by scripts/build_docs_site.py — never edit docs_build/ by hand.
+docs_dir: docs_build
+site_dir: site
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.path
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - tables
+  - fenced_code
+  - admonition
+  - attr_list
+  - pymdownx.details
+  - pymdownx.superfences
+
+plugins:
+  - search
+  - awesome-pages
