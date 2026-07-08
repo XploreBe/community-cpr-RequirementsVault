@@ -2,6 +2,7 @@
 
 **Based on:** 01-requirements-structured-v1.md, 02-scope-and-context-v1.md, 03-product-backlog-v1.md, 04-speckit-specs/
 **Date:** 2026-07-06
+**Last updated:** 2026-07-08 (CHG-001)
 **Status:** Draft — Phase 1 only has stories/specs; Phase 2 rows show requirement IDs with no story yet.
 
 ## 1. Functional Requirements → Story → Spec
@@ -63,7 +64,7 @@ None of the non-functional requirements are implemented in Phase 1 — the walki
 | REQ-N-007 | Least-privilege access control | Security | Not yet — Phase 2 |
 | REQ-N-008 | Security audit logging | Security | Not yet — Phase 2 |
 | REQ-N-009 | Data minimisation | Privacy | Not yet — Phase 2 |
-| REQ-N-010 | Patient location retention limit | Privacy | Not yet — Phase 2, depends on OQ-009 |
+| REQ-N-010 | Patient location retention limit | Privacy | Not yet — Phase 2; retention period resolved: 30 days after incident closure [CHG-001] |
 | REQ-N-011 | Volunteer location only while active/opt-in | Privacy | Not yet — Phase 2, paired with REQ-F-020 |
 | REQ-N-012 | Language configurable per country | Portability | Not yet — Phase 2, depends on OQ-005 |
 | REQ-N-013 | Address format configurable per country | Portability | Not yet — Phase 2, depends on OQ-005 |
@@ -118,7 +119,7 @@ None of the non-functional requirements are implemented in Phase 1 — the walki
 | OQ-006 | Navigation provider conflict (Google Maps vs. OSM/MapLibre/OSRM) | US-104 (Phase 1, conditional); REQ-F-026 |
 | OQ-007 | Precise "sub-second" definition | REQ-N-017 (Phase 2) |
 | OQ-008 | Precise "battery-friendly" definition | REQ-N-018 (Phase 2) |
-| OQ-009 | Patient location retention period | REQ-N-010 (Phase 2) |
+| ~~OQ-009~~ | ~~Patient location retention period~~ | ~~REQ-N-010 (Phase 2)~~ — Resolved — CHG-001: 30 days after incident closure [CHG-001] |
 | OQ-010 | Scope of "encryption everywhere" | REQ-N-006 (Phase 2) |
 | OQ-011 | Role permission boundaries (dispatcher/supervisor/admin) | REQ-F-001 (Phase 2) |
 | OQ-012 | Offline/connectivity handling for alerts | REQ-F-021, REQ-N-001 (Phase 2) |

@@ -22,7 +22,7 @@ Phase 1, currently in this vault, is deliberately smaller than the brief's own "
 
 ## Recent changes
 
-*No changes yet*
+- **CHG-001** (2026-07-08) — OQ-009 resolved: patient location data retention period set to 30 days after incident closure → [[06-change-log]]
 
 Full change history: [[06-change-log]]
 

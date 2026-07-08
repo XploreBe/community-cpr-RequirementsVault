@@ -2,6 +2,7 @@
 
 **Source(s):** "Community CPR Volunteer Dispatch — Project Brief" (PDF, dated 2026-05-29); "Community CPR — 4-Repo Architecture" diagram (provided by Mohamed, 2026-07-06); Mohamed's kickoff conversation, 2026-07-06 (dispatcher-web example stories, phasing intent)
 **Date structured:** 2026-07-06
+**Last updated:** 2026-07-08 (CHG-001)
 **Produced by:** requirements-structuring skill
 **Status:** Draft — needs human review
 
@@ -66,7 +67,7 @@ Community CPR Volunteer Dispatch is a system that lets a 911/112 dispatcher pin 
 | REQ-N-007 | The system shall apply least-privilege access control. | Security | Must | Brief — "Non-functional stuff" (Security) | |
 | REQ-N-008 | The system shall log every security-relevant action for audit purposes. | Security | Must | Brief — "Non-functional stuff" (Security — "audit everything") | Distinct from REQ-F-012 (dispatcher-facing dispatch audit trail); this covers system/admin-level action logging. |
 | REQ-N-009 | The system shall collect the minimum personal data necessary (data minimisation). | Privacy | Must | Brief — "Non-functional stuff" (Privacy) | |
-| REQ-N-010 | Patient location data shall not be retained longer than necessary. | Privacy | Must | Brief — "Non-functional stuff" (Privacy) | Precise retention period not defined — see OQ-009. |
+| REQ-N-010 | Patient location data shall not be retained longer than necessary. | Privacy | Must | Brief — "Non-functional stuff" (Privacy) | Retention period: no later than 30 days after incident closure (resolved — OQ-009). [CHG-001] |
 | REQ-N-011 | Volunteer location shall be collected only while an event is active, or with the volunteer's explicit opt-in otherwise. | Privacy | Must | Brief — "Non-functional stuff" (Privacy) | |
 | REQ-N-012 | Language shall be configurable per country, not hard-coded. | Portability | Must | Brief — "Non-functional stuff" (Portability) | |
 | REQ-N-013 | Address format shall be configurable per country, not hard-coded. | Portability | Must | Brief — "Non-functional stuff" (Portability) | |
@@ -99,7 +100,7 @@ Community CPR Volunteer Dispatch is a system that lets a 911/112 dispatcher pin 
 - **OQ-006:** Which map/navigation provider does the volunteer app actually use? The brief text says "fine to lean on Google Maps" for navigation to the scene, but the architecture diagram shows the volunteer-app's "navigation" edge going to OpenStreetMap/MapLibre/OSRM. These two sources conflict and neither is treated here as decided. — affects REQ-F-026.
 - **OQ-007:** What precisely does "sub-second" mean for nearby-volunteer search — under what concurrency, region size, and volunteer-count assumptions should this be benchmarked? — affects REQ-N-017.
 - **OQ-008:** What precisely does "battery-friendly" mean for background location tracking (e.g. a target sampling interval or battery-drain budget)? — affects REQ-N-018.
-- **OQ-009:** What is the precise retention period for patient location data once an incident is closed? — affects REQ-N-010.
+- ~~**OQ-009:** What is the precise retention period for patient location data once an incident is closed? — affects REQ-N-010.~~ — RESOLVED [CHG-001]: Patient location data must be deleted no later than 30 days after incident closure.
 - **OQ-010:** What precisely does "encryption everywhere" cover — data in transit only, data at rest, specific fields, and what key-management approach? — affects REQ-N-006.
 - **OQ-011:** What specifically distinguishes the permissions of the dispatcher, supervisor, and admin roles, and does a supervisor/admin need any cross-incident overview beyond the per-incident dispatcher view? — affects REQ-F-001.
 - **OQ-012:** What should happen if a volunteer's device is offline, has no signal, or the app has been force-closed by the OS when an alert is sent? Not addressed in the brief. — affects REQ-F-021, REQ-N-001.
