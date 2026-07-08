@@ -40,10 +40,11 @@ Env vars required (all set by the workflow):
 import os
 import re
 import subprocess
+import time
 from datetime import date
 from pathlib import Path
 
-from anthropic import Anthropic
+from anthropic import Anthropic, RateLimitError
 
 from github_api import (
     BOT_LOGIN,
@@ -194,13 +195,38 @@ def execute_tool(name: str, tool_input: dict) -> tuple[str, bool]:
         return f"ERROR: {e}", True
 
 
+MAX_RATE_LIMIT_RETRIES = 4
+RATE_LIMIT_BASE_DELAY_SECONDS = 15
+
+
+def create_message_with_retry(client: Anthropic, **kwargs):
+    """Wraps client.messages.create with retry-and-backoff on a 429 RateLimitError. Prompt
+    caching (see run_agent_loop below) only discounts tokens on turns *after* the first, since
+    there's nothing to read from cache yet on turn one -- so a large first turn (a big skill
+    doc, a verbose vault-qa proposal) can still legitimately exceed the org's per-minute input
+    token budget even with caching in place, exactly as happened on a live run. Since that
+    budget is a rolling per-minute window, waiting and retrying is often enough on its own; this
+    is not a substitute for asking Anthropic to raise the account's rate limit if 429s keep
+    recurring (see README-vault-qa.md)."""
+    delay = RATE_LIMIT_BASE_DELAY_SECONDS
+    for attempt in range(MAX_RATE_LIMIT_RETRIES):
+        try:
+            return client.messages.create(**kwargs)
+        except RateLimitError:
+            if attempt == MAX_RATE_LIMIT_RETRIES - 1:
+                raise
+            time.sleep(delay)
+            delay *= 2
+
+
 def run_agent_loop(client: Anthropic, system_prompt: str, user_message: str) -> dict | None:
     """Runs the tool-use loop until `finish` is called or MAX_TOOL_TURNS is exhausted. Returns
     the finish tool's input dict, or None if it never finished cleanly."""
     messages = [{"role": "user", "content": user_message}]
 
     for _ in range(MAX_TOOL_TURNS):
-        response = client.messages.create(
+        response = create_message_with_retry(
+            client,
             model="claude-sonnet-4-6",
             max_tokens=4096,
             system=system_prompt,
@@ -211,11 +237,10 @@ def run_agent_loop(client: Anthropic, system_prompt: str, user_message: str) -> 
             # history only ever gets appended to, never rewritten -- exactly the multi-turn
             # pattern automatic caching is built for. This matters for more than cost: per
             # Anthropic's docs, cache_read_input_tokens do NOT count towards the per-minute input
-            # token rate limit for this model, only genuinely new (uncached) input tokens do. The
-            # 429 we hit on the very first live run was an input-tokens-per-minute limit, driven
-            # almost entirely by resending the same SKILL.md and already-read file contents on
-            # every turn -- this cuts that repeated cost to ~10% of its token price and takes it
-            # out of the rate-limit calculation entirely from the second turn onward.
+            # token rate limit for this model, only genuinely new (uncached) input tokens do. This
+            # discount only applies from the second turn onward, though -- the first turn is
+            # always a full-price cache *write*, so a 429 on turn one (as happened live) isn't
+            # something caching alone can prevent; that's what create_message_with_retry is for.
             cache_control={"type": "ephemeral"},
         )
         messages.append({"role": "assistant", "content": response.content})
@@ -339,7 +364,8 @@ def extract_chg_fields(client: Anthropic, proposal_text: str) -> dict:
     draft proposal onto change-record-template.md's fields. Raises ValueError -- with the
     model's actual tool call missing or a required field left empty -- rather than silently
     proceeding with a bad or incomplete mapping."""
-    response = client.messages.create(
+    response = create_message_with_retry(
+        client,
         model="claude-sonnet-4-6",
         max_tokens=1000,
         system=(
@@ -451,11 +477,19 @@ def main() -> None:
         + f"Today's date: {date.today().isoformat()}\n"
     )
 
+    # Deliberately NOT re-including the full raw proposal_text here (only the already-extracted
+    # fields below, plus the short issue title/body). It used to be appended "for full context
+    # only", but that's genuinely redundant now that extract_chg_fields() has already pulled out
+    # everything the agent needs -- the agent still reads the real vault files itself via
+    # read_file before editing, which is the actual ground truth, not a paraphrase of it. Keeping
+    # this system/user prompt lean matters more now than it looks: this is the very first,
+    # uncached turn of the agent loop (see create_message_with_retry above), so every token cut
+    # here directly reduces the odds of tripping the org's per-minute rate limit on turn one.
     user_message = (
         "Apply this approved change. It originates from a vault-qa Mode B change proposal "
         "posted as a GitHub Issue comment. The fields below have already been extracted and "
         "mapped into change-record-template.md's field names by this script (not by you) -- "
-        "use them exactly as given, don't re-derive them from the raw comment text:\n\n"
+        "use them exactly as given:\n\n"
         f"Affected item: {mapped['affected_item']}\n"
         f"Old value: {mapped['old_value']}\n"
         f"New value: {mapped['new_value']}\n"
@@ -466,10 +500,7 @@ def main() -> None:
         "'New requirement', 'Requirement removed'), and Resolves OQ (only fill in an OQ-xxx if "
         "the proposal or issue explicitly says this resolves an open question; otherwise use "
         "'—').\n\n"
-        f"--- Original GitHub Issue #{issue_number}: {issue['title']} ---\n{issue['body']}\n\n"
-        f"--- vault-qa's original proposal comment, for full context only -- the fields above "
-        f"are already correctly extracted from it, you do not need to re-parse this ---\n"
-        f"{proposal_text}\n"
+        f"--- Original GitHub Issue #{issue_number}: {issue['title']} ---\n{issue['body']}\n"
     )
 
     result = run_agent_loop(client, system_prompt, user_message)
