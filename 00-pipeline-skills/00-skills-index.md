@@ -43,18 +43,24 @@ The vault-qa skill also runs outside the linear pipeline — any time someone as
 - [[product-backlog/assets/product-backlog-template|Output template]]
 - [[product-backlog/examples/example-input-scope-context|Example input]] · [[product-backlog/examples/example-output-backlog|Example output]]
 
-### 5. change-management *(mid-project, runs any time a change occurs)*
-- [[change-management/SKILL|SKILL.md]] — instructions
-- [[change-management/assets/change-record-template|Change record template]] — fill this in to trigger the skill
-- [[change-management/assets/change-log-template|Change log template]] — format the skill uses for `06-change-log.md`
-- [[change-management/examples/example-input-change-record|Example input]] · [[change-management/examples/example-output-change-log-entry|Example output]]
-
 ### 4. speckit-spec
 - [[speckit-spec/SKILL|SKILL.md]] — instructions
 - [[speckit-spec/assets/speckit-spec-template|Output template]]
 - [[speckit-spec/examples/example-input-backlog-story|Example input]] · [[speckit-spec/examples/example-output-spec|Example output]]
 
+### 5. change-management *(mid-project, runs any time a change occurs)*
+- [[change-management/SKILL|SKILL.md]] — instructions
+- [[change-management/assets/change-record-template|Change record template]] — fill this in to trigger the skill
+- [[change-management/assets/change-log-template|Change log template]] — format the skill uses for `06-change-log.md`
+- [[change-management/examples/example-input-change-record|Example input]] · [[change-management/examples/example-output-change-log-entry|Example output]]
+- `scripts/apply_change_handler.py` — runs this skill autonomously against an approved vault-qa change proposal (see vault-qa below)
+
 ### 6. vault-qa *(runs any time a GitHub Issue asks a question about the vault)*
 - [[vault-qa/SKILL|SKILL.md]] — instructions
 - [[vault-qa/assets/chg-proposal-template|CHG-proposal template]] — format used for a draft change proposal, never a real edit
 - [[vault-qa/examples/example-1-mode-a|Example: Mode A (qa)]] · [[vault-qa/examples/example-2-mode-b|Example: Mode B (proposed_change)]] · [[vault-qa/examples/example-3-mode-c|Example: Mode C (needs_clarification)]]
+- `scripts/vault_qa_handler.py` — the Python handler that runs this skill against a GitHub Issue and posts the answer back
+- `scripts/apply_change_handler.py` — runs change-management as an agent once a proposed change is approved
+- `scripts/github_api.py` — GitHub REST API helpers shared by both scripts above
+- `.github/workflows/vault-qa.yml` — fires vault_qa_handler.py on new/edited issues and comments
+- `.github/workflows/vault-qa-apply-change.yml` — fires apply_change_handler.py when a human adds the `approved` label

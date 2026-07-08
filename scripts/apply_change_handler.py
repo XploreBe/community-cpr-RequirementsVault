@@ -40,17 +40,23 @@ Env vars required (all set by the workflow):
 import os
 import re
 import subprocess
-import sys
 from datetime import date
 from pathlib import Path
 
-import requests
 from anthropic import Anthropic
+
+from github_api import (
+    BOT_LOGIN,
+    STATUS_LINES,
+    get_comments,
+    get_issue,
+    open_pull_request,
+    post_comment,
+)
 
 VAULT_ROOT = Path(".")
 CHANGE_MGMT_SKILL_PATH = VAULT_ROOT / "00-pipeline-skills" / "change-management" / "SKILL.md"
 CHANGE_LOG_PATH = VAULT_ROOT / "06-change-log.md"
-BOT_LOGIN = "github-actions[bot]"
 
 # The exact set of files change-management is allowed to touch, per its own SKILL.md (Section
 # "How to do it", steps 4-9). Anything outside this set -- pipeline instructions, workflows,
@@ -239,53 +245,101 @@ def run_agent_loop(client: Anthropic, system_prompt: str, user_message: str) -> 
     return None
 
 
+def branch_exists_remotely(branch: str) -> bool:
+    """True if origin already has this branch. Checked before ever settling on a CHG number, so
+    a branch left over from an earlier run -- e.g. a CHG whose PR was opened but never merged,
+    or was merged without its branch being deleted -- can't cause a confusing 'failed to push'
+    git error. checkout@v4 already configures an authenticated origin remote, so this needs no
+    extra credentials."""
+    result = subprocess.run(
+        ["git", "ls-remote", "--heads", "origin", branch],
+        capture_output=True, text=True, check=True,
+    )
+    return bool(result.stdout.strip())
+
+
 def get_next_chg_number() -> str:
+    """Next CHG-xxx not yet mentioned in 06-change-log.md AND not already claimed by a
+    chg/chg-xxx branch on the remote. The log-only check used to be the whole algorithm, but
+    that silently breaks the moment an earlier CHG's branch/PR exists without (yet) being
+    merged into the base branch: the log on main still says "no changes yet", so this would
+    recompute the exact same number and its branch push would collide with that still-existing
+    branch -- which is exactly the failure this run just hit live."""
     if not CHANGE_LOG_PATH.exists():
-        return "CHG-001"
-    text = CHANGE_LOG_PATH.read_text(encoding="utf-8")
-    nums = [int(n) for n in re.findall(r"CHG-(\d+)", text)]
-    nxt = (max(nums) + 1) if nums else 1
+        nxt = 1
+    else:
+        text = CHANGE_LOG_PATH.read_text(encoding="utf-8")
+        nums = [int(n) for n in re.findall(r"CHG-(\d+)", text)]
+        nxt = (max(nums) + 1) if nums else 1
+
+    while branch_exists_remotely(f"chg/chg-{nxt:03d}"):
+        nxt += 1
     return f"CHG-{nxt:03d}"
 
 
-def get_issue(repo: str, issue_number: str, token: str) -> dict:
-    url = f"https://api.github.com/repos/{repo}/issues/{issue_number}"
-    resp = requests.get(url, headers={"Authorization": f"Bearer {token}",
-                                       "Accept": "application/vnd.github+json"})
-    resp.raise_for_status()
-    return resp.json()
-
-
-def get_comments(repo: str, issue_number: str, token: str) -> list[dict]:
-    url = f"https://api.github.com/repos/{repo}/issues/{issue_number}/comments"
-    resp = requests.get(url, headers={"Authorization": f"Bearer {token}",
-                                       "Accept": "application/vnd.github+json"})
-    resp.raise_for_status()
-    return resp.json()
-
-
 def find_latest_proposal_comment(comments: list[dict]) -> str | None:
+    marker = f"STATUS: {STATUS_LINES['proposed_change']}"
     for c in reversed(comments):
-        if c["user"]["login"] == BOT_LOGIN and "STATUS: proposed_change" in c["body"]:
+        if c["user"]["login"] == BOT_LOGIN and marker in c["body"]:
             return c["body"]
     return None
 
 
-def post_comment(repo: str, issue_number: str, token: str, body: str) -> None:
-    url = f"https://api.github.com/repos/{repo}/issues/{issue_number}/comments"
-    resp = requests.post(url, headers={"Authorization": f"Bearer {token}",
-                                        "Accept": "application/vnd.github+json"},
-                          json={"body": body})
-    resp.raise_for_status()
+# The literal markdown field headers from 00-pipeline-skills/vault-qa/assets/chg-proposal-template.md,
+# in the order they appear in that template. Used to mechanically pull the proposal's fields out
+# of the bot's comment instead of asking the model to eyeball a translation into
+# change-record-template.md's field names -- see parse_chg_proposal() below.
+CHG_PROPOSAL_FIELDS = [
+    ("affected_item", r"\*\*Affected ID\(s\):\*\*"),
+    ("old_value", r"\*\*Current value[^*]*:\*\*"),
+    ("new_value", r"\*\*Proposed new value:\*\*"),
+    ("reason", r"\*\*Reason given:\*\*"),
+    ("source", r"\*\*Source:\*\*"),
+    ("requested_by", r"\*\*Requested by:\*\*"),
+]
 
 
-def open_pull_request(repo: str, token: str, branch: str, base: str, title: str, body: str) -> dict:
-    url = f"https://api.github.com/repos/{repo}/pulls"
-    resp = requests.post(url, headers={"Authorization": f"Bearer {token}",
-                                        "Accept": "application/vnd.github+json"},
-                          json={"title": title, "head": branch, "base": base, "body": body})
-    resp.raise_for_status()
-    return resp.json()
+def parse_chg_proposal(proposal_text: str) -> dict:
+    """Extract chg-proposal-template.md's fields out of vault-qa's Mode B comment by their
+    literal markdown headers, and return them already renamed to change-record-template.md's
+    field names (affected_item, old_value, new_value, reason -- source/requested_by are kept
+    under their own names since change-record-template.md's 'Triggered by' is a composite of
+    both). This used to be done by asking the model in the prompt to "translate it yourself,
+    the fields map directly" -- that's fine as an instruction but gave no guarantee the model
+    actually applied it correctly on every run. Doing the mechanical rename in code means the
+    only thing left for the model to judge is genuinely judgment-based (Change type, whether an
+    OQ is resolved), not plain field renaming.
+
+    Raises ValueError naming exactly which header is missing, so a drift in
+    chg-proposal-template.md's format shows up as a loud, specific failure instead of the model
+    silently guessing at a mapping.
+    """
+    matches = []
+    for key, pattern in CHG_PROPOSAL_FIELDS:
+        m = re.search(pattern, proposal_text)
+        if not m:
+            raise ValueError(f"chg-proposal-template.md field header not found: {pattern!r}")
+        matches.append((key, m.start(), m.end()))
+    matches.sort(key=lambda item: item[1])
+
+    fields = {}
+    for i, (key, _, end) in enumerate(matches):
+        if i + 1 < len(matches):
+            next_start = matches[i + 1][1]
+        else:
+            # The last field (Requested by) has no following header to bound it, so it would
+            # otherwise capture the template's trailing "---\n**Next step:** ..." boilerplate
+            # too. The template's closing horizontal rule marks the real end of the field data.
+            rule = re.search(r"\n\s*-{3,}\s*\n", proposal_text[end:])
+            next_start = end + rule.start() if rule else len(proposal_text)
+        raw = proposal_text[end:next_start].strip()
+        # Current value / Proposed new value are blockquoted in the template ("> ...") --
+        # strip that marker so the extracted value is just the text itself.
+        raw = "\n".join(
+            line[2:] if line.startswith("> ") else line for line in raw.splitlines()
+        ).strip()
+        fields[key] = raw
+    return fields
 
 
 def run_git(*args: str) -> None:
@@ -342,6 +396,19 @@ def main() -> None:
         )
         return
 
+    try:
+        mapped = parse_chg_proposal(proposal_text)
+    except ValueError as e:
+        post_comment(
+            repo, issue_number, token,
+            f"STATUS: apply_change_failed\n\nCould not parse the change proposal into "
+            f"change-record fields: {e}\n\nThis usually means "
+            f"00-pipeline-skills/vault-qa/assets/chg-proposal-template.md's format has drifted "
+            f"from what apply_change_handler.py expects to parse. No action taken -- this needs "
+            f"a manual look at the template or the parser, not a retry.",
+        )
+        return
+
     chg_id = get_next_chg_number()
     skill_instructions = CHANGE_MGMT_SKILL_PATH.read_text(encoding="utf-8")
 
@@ -363,14 +430,23 @@ def main() -> None:
 
     user_message = (
         "Apply this approved change. It originates from a vault-qa Mode B change proposal "
-        "posted as a GitHub Issue comment, not yet in change-management's own CHG-record "
-        "field names -- translate it yourself, the fields map directly: Affected IDs -> "
-        "Affected item, Current value -> Old value, Proposed new value -> New value, Reason -> "
-        "Reason, Source -> Triggered by. Infer Change type from context. Only fill in Resolves "
-        "OQ if the proposal or issue explicitly says this resolves an open question; otherwise "
-        "use '—'.\n\n"
+        "posted as a GitHub Issue comment. The fields below have already been extracted and "
+        "mapped into change-record-template.md's field names by this script (not by you) -- "
+        "use them exactly as given, don't re-derive them from the raw comment text:\n\n"
+        f"Affected item: {mapped['affected_item']}\n"
+        f"Old value: {mapped['old_value']}\n"
+        f"New value: {mapped['new_value']}\n"
+        f"Reason: {mapped['reason']}\n"
+        f"Triggered by: {mapped['source']} (requested by {mapped['requested_by']})\n\n"
+        "Two fields genuinely need your judgment, not mechanical mapping, so decide these "
+        "yourself from context: Change type (e.g. 'Requirement modified', 'Priority change', "
+        "'New requirement', 'Requirement removed'), and Resolves OQ (only fill in an OQ-xxx if "
+        "the proposal or issue explicitly says this resolves an open question; otherwise use "
+        "'—').\n\n"
         f"--- Original GitHub Issue #{issue_number}: {issue['title']} ---\n{issue['body']}\n\n"
-        f"--- vault-qa's proposal comment (draft, unprocessed) ---\n{proposal_text}\n"
+        f"--- vault-qa's original proposal comment, for full context only -- the fields above "
+        f"are already correctly extracted from it, you do not need to re-parse this ---\n"
+        f"{proposal_text}\n"
     )
 
     client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
@@ -406,10 +482,28 @@ def main() -> None:
 
     branch = f"chg/{chg_id.lower()}"
     configure_git_identity()
-    run_git("checkout", "-b", branch)
-    run_git("add", *changed_files)
-    run_git("commit", "-m", f"{chg_id}: {issue['title']}")
-    run_git("push", "-u", "origin", branch)
+    try:
+        run_git("checkout", "-b", branch)
+        run_git("add", *changed_files)
+        run_git("commit", "-m", f"{chg_id}: {issue['title']}")
+        run_git("push", "-u", "origin", branch)
+    except subprocess.CalledProcessError as e:
+        # The edits themselves succeeded (verify_only_allowed_files_changed already passed) --
+        # only the git/push step failed, most likely a branch name collision get_next_chg_number()
+        # didn't catch (e.g. it was created in the few seconds between that check and this push).
+        # Post something the human can act on instead of leaving them to dig a raw traceback out
+        # of the Action log.
+        post_comment(
+            repo, issue_number, token,
+            f"STATUS: apply_change_failed\n\nThe edits for {chg_id} were made correctly, but "
+            f"creating/pushing branch `{branch}` failed: `{e}`. This usually means that branch "
+            f"already exists on GitHub -- check whether an earlier, unmerged CHG PR is still "
+            f"open, or whether a merged one was never deleted. No PR was opened here; nothing "
+            f"was left half-committed on this run's branch since it never left the runner. "
+            f"Resolve the branch collision, then retry by removing and re-adding the `approved` "
+            f"label.",
+        )
+        return
 
     pr = open_pull_request(
         repo, token, branch, base_branch,

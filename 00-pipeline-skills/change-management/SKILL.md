@@ -14,6 +14,7 @@ This skill assumes the pipeline has already been run at least once and that the 
 - `04-speckit-specs/` folder with individual spec files
 - `05-traceability-matrix.md`
 - `06-change-log.md` (created by this skill on first run if absent)
+- `00-project-home.md` (step 9 below appends a "Recent changes" line to it on every run)
 
 ---
 
