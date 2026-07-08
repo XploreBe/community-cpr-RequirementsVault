@@ -24,9 +24,20 @@ from pathlib import Path
 import requests
 from anthropic import Anthropic
 
+from github_api import (
+    BOT_LOGIN,
+    REQUEST_TIMEOUT,
+    STATUS_LINES,
+    add_label,
+    get_comments,
+    get_current_labels,
+    get_issue,
+    post_comment,
+    remove_label,
+)
+
 VAULT_ROOT = Path(".")
 SKILL_PATH = VAULT_ROOT / "00-pipeline-skills" / "vault-qa" / "SKILL.md"
-BOT_LOGIN = "github-actions[bot]"
 
 # Global rate limit: max bot-authored comments across the whole repo within the trailing hour.
 # This guards against a runaway agent loop (e.g. an agent re-asking the same or similar question
@@ -34,14 +45,9 @@ BOT_LOGIN = "github-actions[bot]"
 # per-issue, and what its known blind spots are.
 RATE_LIMIT_MAX_PER_HOUR = 20
 
-# Maps the skill's JSON "mode" to the literal machine-readable status line prepended to every
-# comment. Deliberately owned by the script, not the model, so an agent parsing this can rely on
-# an exact string match every time — no risk of the model phrasing it slightly differently.
-STATUS_LINES = {
-    "qa": "answered",
-    "proposed_change": "proposed_change",
-    "needs_clarification": "needs_clarification",
-}
+# STATUS_LINES (mode -> machine-readable status line) now lives in github_api.py, shared with
+# apply_change_handler.py, so both scripts agree on the exact string without one being able to
+# drift out of sync with the other.
 
 # Maps each status_line value to the GitHub label that reflects it, so Mohamed can triage straight
 # from the Issues list (filter by label) instead of opening every issue to read the last comment's
@@ -182,22 +188,6 @@ def build_targeted_context(question: str, full_transcript: str) -> tuple[str, li
     return "\n\n".join(included), labels
 
 
-def get_issue(repo: str, issue_number: str, token: str) -> dict:
-    url = f"https://api.github.com/repos/{repo}/issues/{issue_number}"
-    resp = requests.get(url, headers={"Authorization": f"Bearer {token}",
-                                       "Accept": "application/vnd.github+json"})
-    resp.raise_for_status()
-    return resp.json()
-
-
-def get_comments(repo: str, issue_number: str, token: str) -> list[dict]:
-    url = f"https://api.github.com/repos/{repo}/issues/{issue_number}/comments"
-    resp = requests.get(url, headers={"Authorization": f"Bearer {token}",
-                                       "Accept": "application/vnd.github+json"})
-    resp.raise_for_status()
-    return resp.json()
-
-
 def build_transcript(issue: dict, comments: list[dict]) -> tuple[str, str]:
     """Returns (full_transcript_text, current_question). The current question is the most
     recent human message (a new comment, or the issue body itself if there are no comments yet
@@ -211,40 +201,6 @@ def build_transcript(issue: dict, comments: list[dict]) -> tuple[str, str]:
     current_question = human_comments[-1]["body"] if human_comments else (issue.get("body") or issue["title"])
 
     return "\n\n".join(lines), current_question
-
-
-def post_comment(repo: str, issue_number: str, token: str, body: str) -> None:
-    url = f"https://api.github.com/repos/{repo}/issues/{issue_number}/comments"
-    resp = requests.post(url, headers={"Authorization": f"Bearer {token}",
-                                        "Accept": "application/vnd.github+json"},
-                          json={"body": body})
-    resp.raise_for_status()
-
-
-def add_label(repo: str, issue_number: str, token: str, label: str) -> None:
-    url = f"https://api.github.com/repos/{repo}/issues/{issue_number}/labels"
-    resp = requests.post(url, headers={"Authorization": f"Bearer {token}",
-                                        "Accept": "application/vnd.github+json"},
-                          json={"labels": [label]})
-    resp.raise_for_status()
-
-
-def get_current_labels(repo: str, issue_number: str, token: str) -> list[str]:
-    url = f"https://api.github.com/repos/{repo}/issues/{issue_number}/labels"
-    resp = requests.get(url, headers={"Authorization": f"Bearer {token}",
-                                       "Accept": "application/vnd.github+json"})
-    resp.raise_for_status()
-    return [label["name"] for label in resp.json()]
-
-
-def remove_label(repo: str, issue_number: str, token: str, label: str) -> None:
-    url = f"https://api.github.com/repos/{repo}/issues/{issue_number}/labels/{label}"
-    resp = requests.delete(url, headers={"Authorization": f"Bearer {token}",
-                                          "Accept": "application/vnd.github+json"})
-    # A 404 just means the label was already gone (e.g. a race with a manual edit) — not worth
-    # failing the whole run over.
-    if resp.status_code != 404:
-        resp.raise_for_status()
 
 
 def set_status_label(repo: str, issue_number: str, token: str, status_line: str) -> None:
@@ -273,7 +229,8 @@ def count_recent_bot_comments(repo: str, token: str) -> int:
     url = f"https://api.github.com/repos/{repo}/issues/comments"
     resp = requests.get(url, headers={"Authorization": f"Bearer {token}",
                                        "Accept": "application/vnd.github+json"},
-                         params={"since": since, "per_page": 100, "sort": "created", "direction": "desc"})
+                         params={"since": since, "per_page": 100, "sort": "created", "direction": "desc"},
+                         timeout=REQUEST_TIMEOUT)
     resp.raise_for_status()
     comments = resp.json()
     return sum(1 for c in comments if c["user"]["login"] == BOT_LOGIN)

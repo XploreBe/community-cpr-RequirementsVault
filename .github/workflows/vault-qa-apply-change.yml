@@ -21,6 +21,16 @@ jobs:
       github.event.label.name == 'approved' &&
       contains(github.event.issue.labels.*.name, 'status:possible-change')
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Deliberately a single global group, not scoped per issue: this job assigns the next
+    # CHG-xxx number by reading 06-change-log.md, and two of these approved around the same
+    # time on *different* issues could otherwise both read the same "next" number before either
+    # commits. A single group serialises every apply-change run repo-wide, which is the only
+    # way to make that race impossible rather than just less likely. cancel-in-progress is false
+    # so a run already mid-commit is never killed part-way through.
+    concurrency:
+      group: vault-qa-apply-change
+      cancel-in-progress: false
     steps:
       - name: Checkout vault
         uses: actions/checkout@v4
