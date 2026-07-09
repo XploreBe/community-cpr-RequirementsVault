@@ -3,6 +3,7 @@
 **Based on:** 01-requirements-structured-v1.md, 02-scope-and-context-v1.md, 03-product-backlog-v1.md, 04-speckit-specs/
 **Date:** 2026-07-06
 **Status:** Draft — Phase 1 only has stories/specs; Phase 2 rows show requirement IDs with no story yet.
+**Last updated:** 2026-07-09 (CHG-002)
 
 ## 1. Functional Requirements → Story → Spec
 
@@ -90,10 +91,10 @@ None of the non-functional requirements are implemented in Phase 1 — the walki
 
 | Repo | Story | Requirement IDs covered | Spec |
 |------|-------|--------------------------|------|
-| dispatcher-web | US-001 | REQ-F-002, REQ-F-003, REQ-F-004 | [[04-speckit-specs/epic1-us001-create-incident\|Spec]] |
+| dispatcher-web | US-001 | REQ-F-002, REQ-F-003, REQ-F-004 — AC and spec extended with coordinate-range validation [CHG-002] | [[04-speckit-specs/epic1-us001-create-incident\|Spec]] |
 | dispatcher-web | US-002 | REQ-F-002, REQ-F-003, REQ-F-004, REQ-F-005 | [[04-speckit-specs/epic1-us002-view-incidents\|Spec]] |
 | dispatcher-web | US-003 | REQ-F-002..005, REQ-F-012 (simplified) | [[04-speckit-specs/epic1-us003-view-incident-detail\|Spec]] |
-| dispatcher-web | US-004 | REQ-F-005, REQ-F-010 (simplified) | [[04-speckit-specs/epic1-us004-update-incident\|Spec]] |
+| dispatcher-web | US-004 | REQ-F-005, REQ-F-010 (simplified) — AC and spec extended with coordinate-range validation [CHG-002] | [[04-speckit-specs/epic1-us004-update-incident\|Spec]] |
 | dispatcher-web | US-005 | REQ-F-011, REQ-F-010 (simplified) | [[04-speckit-specs/epic1-us005-cancel-resolve-incident\|Spec]] |
 | dispatcher-web | US-006 | REQ-F-013 | [[04-speckit-specs/epic1-us006-view-volunteers\|Spec]] |
 | volunteer-app | US-101 | REQ-F-014, REQ-F-015 | [[04-speckit-specs/epic2-us101-sign-up-with-tier\|Spec]] |

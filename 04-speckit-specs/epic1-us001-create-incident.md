@@ -5,6 +5,7 @@
 **Traces to:** REQ-F-002, REQ-F-003, REQ-F-004
 **Date:** 2026-07-06
 **Produced by:** speckit-spec skill
+**Last updated:** 2026-07-09 (CHG-002)
 
 ---
 
@@ -34,6 +35,9 @@ Given the incident form is open, when the dispatcher leaves the country field bl
 ### Scenario 6 — Single location invariant
 An incident has exactly one location at creation time; the three input methods (click, coordinates, address) are alternative ways to set that one location, not three separate fields.
 
+### Scenario 7 — Out-of-range coordinates rejected (negative) [CHG-002]
+Given the incident form is open, when the dispatcher submits with a latitude outside [-90, 90] or a longitude outside [-180, 180], then the incident is not created and a validation message states the coordinates are out of range.
+
 ---
 
 ## Constraints and assumptions
@@ -58,5 +62,5 @@ An incident has exactly one location at creation time; the three input methods (
 
 ## Constitution snippet
 
-- Location is a required field on an incident — never allow a save without one, in this story or any later one that edits incidents.
+- Location is a required field on an incident — never allow a save without one, in this story or any later one that edits incidents. This shared rule covers both presence (not null/empty) and valid range (latitude ∈ [-90, 90], longitude ∈ [-180, 180]). [CHG-002]
 - Keep the geocoding call isolated behind a small interface/mock boundary now, so swapping in a real provider in Phase 2 doesn't touch the form logic.

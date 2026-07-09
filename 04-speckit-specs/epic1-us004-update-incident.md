@@ -5,6 +5,7 @@
 **Traces to:** REQ-F-005, REQ-F-010 (simplified)
 **Date:** 2026-07-06
 **Produced by:** speckit-spec skill
+**Last updated:** 2026-07-09 (CHG-002)
 
 ---
 
@@ -28,6 +29,9 @@ Given an existing incident, when the dispatcher sets its status to any of the fo
 ### Scenario 4 — Location cannot be cleared (negative)
 Given an existing incident, when the dispatcher edits it so that it would end up with no location, then the save is rejected with the same "location is required" message used at creation (US-001).
 
+### Scenario 5 — Out-of-range coordinates rejected on edit (negative) [CHG-002]
+Given an existing incident, when the dispatcher edits its location to a latitude outside [-90, 90] or a longitude outside [-180, 180] and saves, then the save is rejected and a validation message states the coordinates are out of range — same range rule as US-001.
+
 ---
 
 ## Constraints and assumptions
@@ -50,4 +54,4 @@ Given an existing incident, when the dispatcher edits it so that it would end up
 
 ## Constitution snippet
 
-- The "location is required" rule applies uniformly to create and edit — implement it once, shared, not duplicated per form.
+- The shared location rule applies uniformly to create and edit — implement it once, shared, not duplicated per form. The rule covers both presence (not null/empty) and valid range (latitude ∈ [-90, 90], longitude ∈ [-180, 180]). [CHG-002]
