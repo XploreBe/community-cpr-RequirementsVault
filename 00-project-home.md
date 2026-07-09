@@ -39,7 +39,7 @@ No Phase 1 story or enabler is blocked on an open question right now — the 2 "
 
 ## Recent changes
 
-*No changes yet*
+- **CHG-002** (2026-07-09) — Added coordinate-range validation (lat ∈ [-90, 90], lng ∈ [-180, 180]) to US-001 and US-004 ACs and specs → [[06-change-log]]
 
 Full change history: [[06-change-log]]
 

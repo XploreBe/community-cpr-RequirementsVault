@@ -4,6 +4,7 @@
 **Date:** 2026-07-06
 **Produced by:** product-backlog skill
 **Status:** Draft — for refinement with the team
+**Last updated:** 2026-07-09 (CHG-002)
 
 ## Legend
 
@@ -38,6 +39,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
   - Given the incident form is open, when the dispatcher enters an address, then the (mocked) geocoding step returns coordinates and the incident is created with them.
   - Given the incident form is open, when the dispatcher submits without setting a location by any method, then the incident is not created and a validation message states location is required.
   - Given the incident form is open, when the dispatcher leaves the country field blank, then the incident is still created (country is optional).
+  - Given the incident form is open, when the dispatcher submits with a latitude outside [-90, 90] or a longitude outside [-180, 180], then the incident is not created and a validation message states the coordinates are out of range. [CHG-002]
   - Rule: an incident has exactly one location at creation time.
 - **Priority:** Must · **Size:** S (provisional) · **Phase/Sprint:** Phase 1
 - **Epic:** EPIC-1 · **Traces to:** REQ-F-002, REQ-F-003, REQ-F-004
@@ -81,6 +83,7 @@ This backlog covers **Phase 1 only** (the walking skeleton). Phase 2 and later i
   - Given an existing incident, when the dispatcher edits any field (type, notes, country, or location) and saves, then the incident reflects the new values and its updated timestamp changes.
   - Given an existing incident, when the dispatcher changes its status to "open," "in progress," or "resolved," then the new status is saved and reflected in the list/map view.
   - Given an existing incident, when the dispatcher edits it so that it no longer has a location, then the save is rejected — location remains required (same rule as US-001).
+  - Given an existing incident, when the dispatcher edits its location to a latitude outside [-90, 90] or a longitude outside [-180, 180] and saves, then the save is rejected and a validation message states the coordinates are out of range — same range rule as US-001. [CHG-002]
   - Rule: status may be set to any of open / in progress / resolved / cancelled directly. Phase 1 does not enforce a strict sequential order between them — this is a stated assumption, not a decision; confirm if strict workflow enforcement (e.g. no skipping "in progress") is actually wanted.
 - **Priority:** Must · **Size:** S (provisional) · **Phase/Sprint:** Phase 1
 - **Epic:** EPIC-1 · **Traces to:** REQ-F-005, REQ-F-010 (simplified)
