@@ -101,6 +101,34 @@ The calling script concatenates `answer` and `chg_proposal` itself to build the 
 "Output contract" below). Putting parts 2 and 3 into `answer` as well as `chg_proposal` duplicates
 the entire CHG table in the posted comment — keep `answer` to part 1 only.
 
+## Checking for explicitly-declared sibling rules (Mode B only)
+
+Before finalizing a Mode B proposal, check whether the affected item's own text declares that a
+rule is explicitly shared with another ID — phrases like "same rule as X", "mirrors X", "shared
+with X", or a Constitution snippet that says a rule "applies uniformly to X and Y" / "implement it
+once, shared." This is common in this vault: creation and edit stories, and their backend
+counterparts, frequently state this explicitly rather than leaving it implicit.
+
+Only act on a sharing relationship the vault has **already declared in writing**. Never infer that
+two items should share a rule just because they look similar or cover the same entity — that would
+be inventing scope, exactly what this skill must never do. The bar is a literal cross-reference in
+the text, not a judgment call about what "should" be shared.
+
+If such a declaration exists, check whether the sibling ID has the *exact same category* of gap
+the current question is about (not just the same general topic). If it does, fold it into the same
+proposal — the same `chg_proposal`, with all genuinely affected IDs listed together — rather than
+answering only the ID the asker happened to name and leaving the sibling for a human to notice and
+ask about separately in a follow-up comment.
+
+If the sibling does not have the same gap (it already covers this dimension, or the declared
+shared rule doesn't extend that far), say so explicitly in the current-value section and move on —
+don't force a sibling in just because one was found.
+
+If following declared cross-references would chain through three or more files, it's fine to stop
+and name the remaining ones in `answer` as "also worth checking" instead of fully resolving each —
+better to surface possible related IDs than miss them, but this must not turn into a full audit of
+the vault for every question. State plainly which IDs you checked and which you only flagged.
+
 ## Mode C — the question itself is ambiguous
 
 Use this only when the *question* could reasonably mean two different things and answering
@@ -143,6 +171,12 @@ needs_clarification` line in the output contract.
   is clear but the vault is silent, that's Mode A with a stated gap, not Mode C.
 - Picking a reading in Mode C because it "seems more likely" — the entire point is that the skill
   doesn't get to make that call; a human or the agent's own logic does, after clarifying.
+- In Mode B, answering only the ID the asker named when a sibling ID has an explicit, written
+  "same rule as" / "mirrors" / "shared" cross-reference to it and shares the exact same gap — this
+  just pushes the discovery work onto Mohamed a comment later instead of doing it up front.
+- The opposite trap is just as real: bundling in a sibling ID that merely looks related, without a
+  literal cross-reference in the vault text backing it up. That is inventing scope by another
+  name.
 - In Mode B, copying the CHG table and/or the closing line into `answer` as well as
   `chg_proposal`. The calling script appends `chg_proposal` after `answer` itself — if both fields
   contain the change record, it appears twice in the posted comment. `answer` holds only the
