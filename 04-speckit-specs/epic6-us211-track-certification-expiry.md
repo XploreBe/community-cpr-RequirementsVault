@@ -41,7 +41,7 @@ Given a certification was uploaded without a machine-readable expiry date (e.g. 
 - What happens once flagged expired (demotion, exclusion from alerts, or something else) — see Unresolved.
 
 **Unresolved:**
-- OQ-014 (what happens when a certification expires without re-verification — demoted to a lower tier, excluded from alerts entirely, or something else; and what happens to an in-flight incident if a notified/accepted volunteer's account is affected) — do not invent this behaviour. Raise a follow-up story once OQ-014 is answered.
+- None blocking. OQ-014 resolved [CHG-017]: an expired certification excludes the volunteer from new alerts until re-verified — no automatic tier demotion. An in-flight incident is never interrupted by a certification change mid-response (see US-222 for the deactivation side).
 
 ---
 

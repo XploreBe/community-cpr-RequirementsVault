@@ -8,6 +8,199 @@ Changes are listed newest first. Each entry is permanent — never deleted or ed
 
 ---
 
+## CHG-017 — Resolve OQ-014 (certification-expiry consequence; mid-incident deactivation)
+**Date:** 2026-07-13
+**Triggered by:** Mohamed, session 2026-07-13 (pre-vacation OQ clean-up round)
+**Change type:** OQ resolved
+**Affected item:** OQ-014 / REQ-F-017 / REQ-F-018 / REQ-F-035 / US-211 / US-222
+**Old value:** Undefined what happens when a certification expires without re-verification, and undefined what happens to an in-flight incident if a notified/accepted volunteer's account is deactivated mid-response.
+**New value:** An expired certification excludes the volunteer from new alerts until re-verified — no automatic demotion to a lower tier. An in-flight incident is never interrupted: a volunteer already notified/accepted on an incident stays active on it regardless of a certification change or account deactivation that happens mid-response.
+**Reason:** Mohamed's direction: simplest safe default — don't build automatic tier-demotion logic, and never let a backend-side account change abort or reassign a live incident.
+**Resolves:** OQ-014
+
+### Items updated
+- `01-requirements-structured-v1.md` — OQ-014 marked resolved (§5); REQ-F-017, REQ-F-018, REQ-F-035 Notes updated (§2)
+- `03-product-backlog-v1.md` — US-211 Status/Notes updated (no longer "rests on OQ-014"); US-222 Notes updated
+- `04-speckit-specs/epic6-us211-track-certification-expiry.md`, `epic6-us212-remind-reverify-certification.md`, `epic8-us222-admin-manage-volunteers.md` — Unresolved/Out-of-scope sections updated to reflect resolution
+- `05-traceability-matrix.md` — REQ-F-017/018/035 rows (§1 n/a — no row edit needed there), Story→Requirements US-211 row (§4), and OQ-014 row (§5) updated
+
+### Items reviewed — no change needed
+- US-210, US-215, US-223 — reference the certification lifecycle but don't depend on the specific expiry-consequence detail.
+
+### Follow-up actions required
+- None — both affected stories (US-211, US-222) are Phase 3, not being built now; the resolution is recorded and ready when that phase is picked up.
+
+---
+
+## CHG-016 — Resolve OQ-010 (scope of "encryption everywhere")
+**Date:** 2026-07-13
+**Triggered by:** Mohamed, session 2026-07-13 (pre-vacation OQ clean-up round)
+**Change type:** OQ resolved
+**Affected item:** OQ-010 / REQ-N-006
+**Old value:** "The system shall encrypt data everywhere" — scope undefined (in transit only, at rest, specific fields, key management approach all unspecified).
+**New value:** Minimum HTTPS/TLS in transit for everything, plus at-rest encryption for sensitive fields (location, personal data) using whatever the chosen datastore offers by default. No specific key-management scheme mandated — left to the development team's discretion.
+**Reason:** Mohamed's direction: keep this loose, not strict — functional requirement is "encrypted," not a prescribed mechanism.
+**Resolves:** OQ-010
+
+### Items updated
+- `01-requirements-structured-v1.md` — OQ-010 marked resolved (§5); REQ-N-006 Notes updated (§3)
+- `03-product-backlog-v1.md` — US-201 Notes updated
+- `04-speckit-specs/epic4-us201-login-with-role-based-access.md` — Unresolved section updated
+- `05-traceability-matrix.md` — REQ-N-006 row (§2) and OQ-010 row (§5) updated
+
+### Items reviewed — no change needed
+- REQ-N-007, REQ-N-008 (least-privilege, audit logging) — separate security NFRs, unaffected by this specific resolution.
+
+### Follow-up actions required
+- None — US-201 is Phase 3, not being built now; the resolution is recorded and ready when that phase is picked up.
+
+---
+
+## CHG-015 — Resolve OQ-008 (definition of "battery-friendly")
+**Date:** 2026-07-13
+**Triggered by:** Mohamed, session 2026-07-13 (pre-vacation OQ clean-up round)
+**Change type:** OQ resolved
+**Affected item:** OQ-008 / REQ-N-018
+**Old value:** "Background location tracking shall be battery-friendly" — no measurable definition (sampling interval, battery-drain budget) given.
+**New value:** No concrete number specified — "reasonable battery use, no aggressive constant GPS polling." Left entirely to the development team's engineering discretion.
+**Reason:** Mohamed's direction: agreed with the proposed simple, unspecified default rather than inventing a number.
+**Resolves:** OQ-008
+
+### Items updated
+- `01-requirements-structured-v1.md` — OQ-008 marked resolved (§5); REQ-N-018 Notes updated (§3)
+- `03-product-backlog-v1.md` — US-214 Notes updated
+- `04-speckit-specs/epic6-us214-consent-background-location.md` — Unresolved section updated
+- `05-traceability-matrix.md` — REQ-N-018 row (§2) and OQ-008 row (§5) updated
+
+### Items reviewed — no change needed
+- US-204 — uses registered/last-known location, not continuous background tracking, so this resolution doesn't touch it.
+
+### Follow-up actions required
+- None — US-214 is Phase 3, not being built now; the resolution is recorded and ready when that phase is picked up.
+
+---
+
+## CHG-014 — Resolve OQ-013 (can a volunteer back out after accepting?)
+**Date:** 2026-07-13
+**Triggered by:** Mohamed, session 2026-07-13 (pre-vacation OQ clean-up round)
+**Change type:** OQ resolved
+**Affected item:** OQ-013 / REQ-F-024 / REQ-F-010 / US-103 / US-208
+**Old value:** Undefined whether a volunteer can back out after already accepting an alert, and if so how that's handled downstream (dispatcher notified, pool widens again).
+**New value:** No — a volunteer cannot back out after accepting in this round. Once accepted, accepted; no back-out flow, no downstream handling to build.
+**Reason:** Mohamed's direction: keep it simple for this round.
+**Resolves:** OQ-013
+
+### Items updated
+- `01-requirements-structured-v1.md` — OQ-013 marked resolved (§5); REQ-F-024 Notes updated (§2)
+- `03-product-backlog-v1.md` — US-208 Notes updated; "Items sent back — Phase 2" bullet updated
+- `04-speckit-specs/epic2-us103-accept-decline-alert.md` (Phase 1) and `epic5-us208-live-per-volunteer-status.md` (Phase 2) — Unresolved sections updated to reflect resolution
+- `05-traceability-matrix.md` — Story→Requirements US-208 row (no edit needed — already correct) and OQ-013 row (§5) updated
+
+### Items reviewed — no change needed
+- US-104, US-105, US-106 (Phase 1 volunteer-app) — no dependency on back-out behaviour.
+
+### Follow-up actions required
+- None. Both stories (US-103, already built in Phase 1; US-208, Phase 2 active) can proceed as originally scoped, now confirmed rather than assumed.
+
+---
+
+## CHG-013 — Resolve OQ-012 (offline/force-closed device handling for alerts)
+**Date:** 2026-07-13
+**Triggered by:** Mohamed, session 2026-07-13 (pre-vacation OQ clean-up round)
+**Change type:** OQ resolved
+**Affected item:** OQ-012 / REQ-F-021 / REQ-N-001 / US-216
+**Old value:** Undefined what should happen if a volunteer's device is offline, has no signal, or the app has been force-closed by the OS when an alert is sent.
+**New value:** Counts simply as "not reached" — no retry or queueing logic. The alert-widening flow (US-207) proceeds exactly as if the volunteer had ignored the alert.
+**Reason:** Mohamed's direction: agreed with the proposed simplest default rather than building retry/queueing behaviour.
+**Resolves:** OQ-012
+
+### Items updated
+- `01-requirements-structured-v1.md` — OQ-012 marked resolved (§5); REQ-F-021 Notes updated (§2)
+- `03-product-backlog-v1.md` — US-216 Notes updated
+- `04-speckit-specs/epic7-us216-receive-real-push-alert.md` — Unresolved section updated
+- `05-traceability-matrix.md` — OQ-012 row (§5) updated
+
+### Items reviewed — no change needed
+- US-218 (delivery status tracking) — "not reached" is already one of its two tracked states (REQ-F-034); nothing to change there.
+
+### Follow-up actions required
+- None. US-216 is Phase 2 active — ready to build as originally scoped, now confirmed.
+
+---
+
+## CHG-012 — Resolve OQ-009 (patient location retention period)
+**Date:** 2026-07-13
+**Triggered by:** Mohamed, session 2026-07-13 (pre-vacation OQ clean-up round)
+**Change type:** OQ resolved
+**Affected item:** OQ-009 / REQ-N-010 / US-209
+**Old value:** "Patient location data shall not be retained longer than necessary" — no precise retention period defined.
+**New value:** 90 days, set as a placeholder value — easy to change later, not a legally-researched figure. Context checked: GDPR Art. 5(1)(e) itself sets no fixed number, only a "storage limitation" principle (no longer than necessary for the purpose); a real jurisdiction-specific figure would need legal review, deferred since this is a test project.
+**Reason:** Mohamed's direction: use 90 days now so the team has a concrete number to build against; revisit later since it's a test project, not a production legal commitment.
+**Resolves:** OQ-009
+
+### Items updated
+- `01-requirements-structured-v1.md` — OQ-009 marked resolved (§5); REQ-N-010 Notes updated (§3)
+- `03-product-backlog-v1.md` — US-209 Notes updated
+- `04-speckit-specs/epic5-us209-full-dispatch-audit-trail.md` — Unresolved section updated
+- `05-traceability-matrix.md` — REQ-N-010 row (§2) and OQ-009 row (§5) updated
+
+### Items reviewed — no change needed
+- None — this OQ only ever touched US-209.
+
+### Follow-up actions required
+- Before any real (non-test) deployment, get actual legal review of the retention period per deployment jurisdiction — 90 days is a working placeholder, not a compliance-reviewed figure.
+
+---
+
+## CHG-011 — Resolve OQ-007 (precise definition of "sub-second")
+**Date:** 2026-07-13
+**Triggered by:** Mohamed, session 2026-07-13 (pre-vacation OQ clean-up round)
+**Change type:** OQ resolved
+**Affected item:** OQ-007 / REQ-N-017 / US-204
+**Old value:** "Sub-second" search performance — no precise definition (concurrency, region size, volunteer-count assumptions) given.
+**New value:** Kept simple — a flat "under 1 second," regardless of scale/concurrency/region. No benchmark methodology or load-testing assumptions specified.
+**Reason:** Mohamed's direction: keep it simple.
+**Resolves:** OQ-007
+
+### Items updated
+- `01-requirements-structured-v1.md` — OQ-007 marked resolved (§5); REQ-N-017 Notes updated (§3)
+- `03-product-backlog-v1.md` — US-204 Notes updated; NFR table row updated
+- `04-speckit-specs/epic5-us204-nearby-volunteers-radius-bands.md` — Unresolved section updated
+- `05-traceability-matrix.md` — REQ-N-017 row (§2) and OQ-007 row (§5) updated
+
+### Items reviewed — no change needed
+- None — this OQ only ever touched US-204.
+
+### Follow-up actions required
+- None. US-204 is Phase 2 active — ready to build as originally scoped, now confirmed.
+
+---
+
+## CHG-010 — Resolve AS-001 (does "trained volunteers" include healthcare professionals?)
+**Date:** 2026-07-13
+**Triggered by:** Mohamed, session 2026-07-13 (pre-vacation OQ clean-up round)
+**Change type:** OQ resolved
+**Affected item:** AS-001 / REQ-F-008 / REQ-F-032 / US-206
+**Old value:** AS-001 assumed "trained volunteers" (the brief's core-flow phrase) meant the same thing as the "certified" tier alone, not a separate/broader category. This was flagged as an unconfirmed standing assumption, not resolved by CHG-003, and was the sole reason US-206 was "Ready (conditional)" rather than fully Ready.
+**New value:** The assumption was too narrow. "Trained volunteers" (the first alert wave) means certified/verified CPR-BLS **and** healthcare professional combined, notified together in the same first wave. Willing-but-untrained remains reachable only via widening (US-207).
+**Reason:** Mohamed's explicit answer: "getrainde zijn certified plus healthcare samen."
+**Resolves:** — (treated as an OQ-style resolution per the change-management skill's step 5, since it unblocks a "Ready (conditional)" story exactly like an OQ would)
+
+### Items updated
+- `01-requirements-structured-v1.md` — AS-001 marked resolved (§6); REQ-F-008, REQ-F-032 Notes updated (§2)
+- `03-product-backlog-v1.md` — US-206 Story/AC/Grounding/Status updated (conditional → Ready)
+- `04-speckit-specs/epic5-us206-tiered-notification-order.md` — Scenario 1, Constraints, and Unresolved sections updated to reflect the confirmed two-tier first wave
+- `04-speckit-specs/00-index.md` — US-206 listing updated (no longer "conditional")
+- `05-traceability-matrix.md` — REQ-F-008, REQ-F-032 rows (§1) and Story→Requirements US-206 row (§4) updated
+
+### Items reviewed — no change needed
+- US-205, US-207 (send alert, widen pool) — operate on whatever tier sequence US-206 defines; no direct edit needed, they already reference US-206 generically.
+
+### Follow-up actions required
+- `00-project-home.md` Phase 2 readiness table: recompute — US-206 moves from "Ready (conditional)" to "Ready," so Phase 2 is now 9/9 fully Ready, 0 conditional.
+
+---
+
 ## CHG-009 — Rescope Phase 2 to the simple core loop; defer auth/MFA, certification workflow, location consent, and country portability/admin tools to Phase 3
 **Date:** 2026-07-13
 **Triggered by:** Mohamed, same session as CHG-003..008 — after reviewing the first Phase 2 draft (24 stories), decided it was bigger than intended

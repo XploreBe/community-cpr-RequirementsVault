@@ -37,10 +37,10 @@ Given an alert already marked "accepted" (or "declined"), when the volunteer tap
 ## Out of scope
 
 - Notifying the dispatcher of the acceptance/decline in real time (Phase 2 — REQ-F-010 full, depends on CON-005's WebSocket channel).
-- Backing out after already accepting (OQ-013 — not addressed by the brief; not implemented here).
+- Backing out after already accepting (OQ-013 resolved [CHG-014]: no — not implemented, not planned for this round).
 
 **Unresolved — dev should not implement until confirmed:**
-- OQ-013 (can a volunteer cancel after accepting?) — this story implements accept and decline only, as two one-way actions from the "no response yet" state. Do not add a "back out after accepting" action without confirming first.
+- None blocking. OQ-013 resolved [CHG-014]: once accepted, accepted — no back-out action in this round.
 
 ---
 

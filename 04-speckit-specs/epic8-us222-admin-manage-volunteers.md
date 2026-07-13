@@ -39,7 +39,7 @@ Given a volunteer is currently notified or has accepted an active incident, when
 - Automatically resolving or reassigning an in-flight incident when a responding volunteer is deactivated — see Unresolved.
 
 **Unresolved:**
-- OQ-014 (what happens to an in-flight incident if a notified/accepted volunteer's account is deactivated mid-response) — do not invent behaviour here (e.g. auto-widening the pool). Raise as a follow-up once OQ-014 is answered.
+- None blocking. OQ-014 resolved [CHG-017]: an in-flight incident is never interrupted — a volunteer already notified/accepted stays active on that incident even if an admin deactivates their account mid-response. No auto-widening or auto-reassignment triggered by the deactivation.
 
 ---
 

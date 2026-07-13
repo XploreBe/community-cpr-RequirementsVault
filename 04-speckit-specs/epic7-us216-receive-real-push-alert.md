@@ -41,8 +41,8 @@ Given the volunteer already has the app open when the alert arrives, when the pu
 - Behaviour when the device is offline, has no signal, or the app was force-closed by the OS — see Unresolved.
 
 **Unresolved:**
-- OQ-012 (what should happen if the volunteer's device is offline/no signal/app force-closed when an alert is sent) — do not invent retry or queueing behaviour; raise as a follow-up once answered.
-- OQ-015 (how the 5s/95% target is measured/monitored in production) — build toward the target; do not build a monitoring dashboard against a guessed methodology.
+- OQ-012 resolved [CHG-013]: offline/no-signal/force-closed counts simply as "not reached" — no retry/queueing logic; widening (US-207) proceeds exactly as if the volunteer had ignored the alert.
+- OQ-015 (how the 5s/95% target is measured/monitored in production) — still open. Build toward the target; do not build a monitoring dashboard against a guessed methodology.
 
 ---
 

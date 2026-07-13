@@ -16,8 +16,8 @@ The most qualified volunteers should get the first chance to respond, so the ale
 
 ## User scenarios
 
-### Scenario 1 — Certified tier notified first
-Given nearby volunteers span more than one tier, when an alert is sent, then certified/verified CPR-BLS volunteers are notified first, ahead of the healthcare-professional and willing-but-untrained tiers.
+### Scenario 1 — Trained tier notified first [CHG-010]
+Given nearby volunteers span more than one tier, when an alert is sent, then certified/verified CPR-BLS **and** healthcare-professional volunteers are notified together, in the first wave, ahead of the willing-but-untrained tier. AS-001 resolved [CHG-010]: "trained volunteers" means these two tiers combined, not certified alone.
 
 ### Scenario 2 — Single-tier case (edge case)
 Given all nearby volunteers happen to be in the same tier, when an alert is sent, then they are all notified together — there is no artificial delay waiting for a "next tier" that doesn't apply.
@@ -30,7 +30,7 @@ Tiering and ordering rules are configurable (REQ-F-032) rather than hard-coded i
 ## Constraints and assumptions
 
 - Final tier breakdown confirmed (OQ-001 resolved — CHG-003): certified/verified CPR-BLS, healthcare professional (its own separate tier), willing-but-untrained.
-- Provisional assumption (to confirm with Mohamed, not resolved by CHG-003): AS-001 — whether the brief's "trained volunteers" phrase in the core flow description means the same thing as the "certified" tier. This was not addressed by the OQ-001 resolution and remains open; do not silently assume an answer beyond what's stated in 01-requirements-structured-v1.md §6.
+- AS-001 resolved [CHG-010]: "trained volunteers" (the first notified wave) means certified/verified CPR-BLS **and** healthcare professional combined, not certified alone. Willing-but-untrained is reached only via widening (US-207).
 - [CHG-009] Per-country configurability (REQ-N-016) is deferred to Phase 3 along with the rest of country portability — build one system-wide tier order/config for now, not a per-country one.
 
 ---
@@ -41,7 +41,7 @@ Tiering and ordering rules are configurable (REQ-F-032) rather than hard-coded i
 - Per-country configuration of tier order — deferred to Phase 3 (US-219..221).
 
 **Unresolved:**
-- AS-001 (see above) — flag to Mohamed for explicit confirmation if it materially affects how "trained volunteers" is matched against the certified tier before building.
+- None blocking. AS-001 resolved [CHG-010] — see Constraints above.
 
 ---
 

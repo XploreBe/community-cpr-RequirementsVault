@@ -41,7 +41,7 @@ Given an incident has just been created with no dispatch activity yet, when the 
 - Automatic deletion of patient location data after a retention period — see Unresolved.
 
 **Unresolved:**
-- OQ-009 (precise retention period for patient location data once an incident is closed) — REQ-N-010 requires location data isn't kept longer than necessary, but the exact period isn't defined. Build the audit trail itself now; do not implement an automatic-deletion job against a guessed number.
+- None blocking. OQ-009 resolved [CHG-012]: 90 days, placeholder value pending real legal review per deployment jurisdiction — easy to change later.
 
 ---
 

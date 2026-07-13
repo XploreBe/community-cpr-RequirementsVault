@@ -44,7 +44,7 @@ Given no volunteers are found within any configured band, when the dispatcher op
 - Per-country radius configuration — deferred to Phase 3 with the rest of country portability (US-219..221).
 
 **Unresolved:**
-- OQ-007 (precise definition of "sub-second" — under what concurrency, region size, volunteer-count assumptions) — affects how this search's performance is benchmarked. Build toward the sub-second intent; do not invent a specific benchmark methodology or number.
+- None blocking. OQ-007 resolved [CHG-011]: kept simple — a flat "under 1 second," no concurrency/region/volunteer-count benchmark specified.
 
 ---
 
