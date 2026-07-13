@@ -5,6 +5,7 @@
 **Traces to:** REQ-F-016
 **Date:** 2026-07-13
 **Produced by:** speckit-spec skill
+**Status:** Deferred to Phase 3 [CHG-009, 2026-07-13] — not part of the current Phase 2 round (tiered alerting works off self-declared tier from Phase 1 for now). Kept as-is, ready to pick up later.
 
 ---
 

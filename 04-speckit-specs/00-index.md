@@ -2,7 +2,7 @@
 
 All Phase 1 stories are Ready, so every Phase 1 backlog item has a spec file below. No Phase 1 items are blocked — see [[blocked-stories]] (empty; kept for future pipeline runs). US-101 and US-104 were previously Ready (conditional) but their open questions are now resolved (CHG-003, CHG-004) with no rework needed.
 
-All 24 Phase 2 stories (EPIC-4 through EPIC-8) are also Ready and have spec files below — see 03-product-backlog-v1.md for the full backlog. Unlike Phase 1, Phase 2 has no repo tags and no enablers/spikes (one consolidated repo, spec-driven development). US-206 is Ready (conditional — rests on AS-001, not an open question); every other Phase 2 story is unconditionally Ready.
+**[CHG-009, 2026-07-13]** Of the 24 Phase 2 stories originally drafted, only **9 stay in the current Phase 2 round** (the simple core notification loop) — the other **15 are deferred to Phase 3** (auth/MFA, certification workflow, location consent, country portability, admin tools). All 24 spec files still exist below; deferred ones are marked with a **Status: Deferred to Phase 3** line at the top of the file. Nothing was deleted — see 03-product-backlog-v1.md's "Phase 3 (deferred, CHG-009)" section for the full reasoning.
 
 ## EPIC-1 — Incident record management (dispatcher-web)
 
@@ -30,13 +30,9 @@ All 24 Phase 2 stories (EPIC-4 through EPIC-8) are also Ready and have spec file
 
 ---
 
-## EPIC-4 — Authentication & roles (Phase 2)
+## Phase 2 (current round) — the simple core loop
 
-- [[epic4-us201-login-with-role-based-access|US-201 — Log in with role-based access]]
-- [[epic4-us202-complete-mfa-at-login|US-202 — Complete MFA at login]]
-- [[epic4-us203-admin-cross-incident-oversight|US-203 — Admin: cross-incident oversight]]
-
-## EPIC-5 — Volunteer matching & alerting (Phase 2)
+### EPIC-5 — Volunteer matching & alerting
 
 - [[epic5-us204-nearby-volunteers-radius-bands|US-204 — See nearby volunteers within radius bands]]
 - [[epic5-us205-send-alert-to-volunteers|US-205 — Send an alert to identified volunteers]]
@@ -45,22 +41,38 @@ All 24 Phase 2 stories (EPIC-4 through EPIC-8) are also Ready and have spec file
 - [[epic5-us208-live-per-volunteer-status|US-208 — Live per-volunteer status view]]
 - [[epic5-us209-full-dispatch-audit-trail|US-209 — Full dispatch audit trail]]
 
-## EPIC-6 — Certification, availability & privacy (Phase 2)
+### EPIC-6 (partial) — Volunteer availability
+
+- [[epic6-us213-set-availability|US-213 — Set availability]]
+
+### EPIC-7 (partial) — Real push delivery
+
+- [[epic7-us216-receive-real-push-alert|US-216 — Receive a real push alert via FCM]]
+- [[epic7-us218-track-push-delivery-status|US-218 — Track push delivery status]]
+
+---
+
+## Phase 3 (deferred, CHG-009) — auth, certification, country portability, admin tools
+
+### EPIC-4 — Authentication & roles
+
+- [[epic4-us201-login-with-role-based-access|US-201 — Log in with role-based access]]
+- [[epic4-us202-complete-mfa-at-login|US-202 — Complete MFA at login]]
+- [[epic4-us203-admin-cross-incident-oversight|US-203 — Admin: cross-incident oversight]]
+
+### EPIC-6 (remainder) — Certification & privacy
 
 - [[epic6-us210-upload-certification|US-210 — Upload certification documentation]]
 - [[epic6-us211-track-certification-expiry|US-211 — Track certification expiry]]
 - [[epic6-us212-remind-reverify-certification|US-212 — Remind volunteer to re-verify before expiry]]
-- [[epic6-us213-set-availability|US-213 — Set availability]]
 - [[epic6-us214-consent-background-location|US-214 — Give consent for background location collection]]
 - [[epic6-us215-volunteer-status-history|US-215 — View volunteer status and certification history (admin)]]
 
-## EPIC-7 — Real push delivery (Phase 2)
+### EPIC-7 (remainder)
 
-- [[epic7-us216-receive-real-push-alert|US-216 — Receive a real push alert via FCM]]
 - [[epic7-us217-push-dnd-bypass|US-217 — Push alert attempts DND bypass]]
-- [[epic7-us218-track-push-delivery-status|US-218 — Track push delivery status]]
 
-## EPIC-8 — Country portability & admin tools (Phase 2)
+### EPIC-8 — Country portability & admin tools
 
 - [[epic8-us219-country-scoped-data-visibility|US-219 — Country-scoped data visibility]]
 - [[epic8-us220-configure-country-settings|US-220 — Configure country-specific settings]]

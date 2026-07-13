@@ -4,7 +4,7 @@
 **Date:** 2026-07-06
 **Produced by:** product-backlog skill
 **Status:** Draft — for refinement with the team
-**Last updated:** 2026-07-13 (Phase 2 backlog added, CHG-003 through CHG-008)
+**Last updated:** 2026-07-13 (CHG-009 — Phase 2 rescoped to the simple core loop; auth/MFA, certification workflow, location consent, and country-portability/admin stories deferred to Phase 3)
 
 ## Legend
 
@@ -16,7 +16,7 @@
 - **Delivery status:** Not started · In Progress · Done — manually maintained by the delivery team; not touched by any pipeline skill
 - **Grounding:** Direct (traces to a stated requirement) · Derived (rests on the Phase 1 walking-skeleton simplification agreed with Mohamed — see 02-scope-and-context-v1.md §3 — or another stated assumption)
 
-This backlog covers **Phase 1** (the walking skeleton, EPIC-1..3, repo-tagged, includes enablers) and **Phase 2** (the brief's real MVP, EPIC-4..8, one flat repo, stories only — no enablers/spikes, per the team's move to a single consolidated repo and spec-driven development at pickup time). Phase 2 became draftable once OQ-001, OQ-003, OQ-004, OQ-005, OQ-006, and OQ-011 were resolved via CHG-003 through CHG-008 (2026-07-13) — see 06-change-log.md. Every Phase 2 story is grounded in what 01-requirements-structured-v1.md and 02-scope-and-context-v1.md §4 already state; no new scope was invented, and any technical decision Mohamed delegated to the dev team (geospatial DB, push mechanism, navigation provider, country-abstraction shape) is called out as such rather than specified here.
+This backlog covers **Phase 1** (the walking skeleton, EPIC-1..3, repo-tagged, includes enablers), **Phase 2** (the simple, real core dispatch loop — no auth, no cert workflow, no country config, per CHG-009), and **Phase 3** (deferred: authentication/MFA, certification workflow, location consent, country portability, admin tools). Phase 2 stories became draftable once OQ-001, OQ-003, OQ-004, OQ-005, OQ-006, and OQ-011 were resolved via CHG-003 through CHG-008 (2026-07-13) — see 06-change-log.md. On review with Mohamed (CHG-009, same day), the first Phase 2 draft turned out bigger than intended: it included things the brief eventually needs (real login/MFA, a full certification lifecycle, country configurability) but that aren't needed to get the actual core loop — a volunteer being found, alerted, and notified — working simply. Those stories are kept (IDs and content intact, nothing deleted, per CLAUDE.md's "IDs are permanent" rule) but reassigned to Phase 3 rather than built now. Every remaining Phase 2 story is still grounded in 01-requirements-structured-v1.md and 02-scope-and-context-v1.md §4; no new scope was invented, and any technical decision Mohamed delegated to the dev team is called out as such rather than specified here.
 
 ## Epics
 
@@ -25,11 +25,11 @@ This backlog covers **Phase 1** (the walking skeleton, EPIC-1..3, repo-tagged, i
 | EPIC-1 | dispatcher-web | Incident record management | A dispatcher can create, view, update, and resolve incident records with a location, and browse a list of volunteers — no login, no real backend | REQ-F-002..005, 010 (simplified), 011, 012 (simplified), 013 | Phase 1 |
 | EPIC-2 | volunteer-app | Alert response walking skeleton | A volunteer can sign up, see a mocked alert, accept/decline, navigate to the scene, consult CPR guidance, and check in afterward — no login, no real push | REQ-F-014, 015, 024, 025, 026, 027, 028, 029, 030 | Phase 1 |
 | EPIC-3 | backend-api | API & module scaffold | The backend has its module boundaries in place plus minimal CRUD endpoints for incidents and a read endpoint for volunteers — no auth, no geospatial/alert/push logic | CON-003, REQ-F-035 (partial) | Phase 1 |
-| EPIC-4 | — | Authentication & roles | A dispatcher or admin can log in securely with role-appropriate access; admin gets cross-incident oversight | REQ-F-001, REQ-N-005, REQ-N-006, REQ-N-007, REQ-N-008 | Phase 2 |
+| EPIC-4 | — | Authentication & roles | A dispatcher or admin can log in securely with role-appropriate access; admin gets cross-incident oversight | REQ-F-001, REQ-N-005, REQ-N-006, REQ-N-007, REQ-N-008 | **Phase 3** [CHG-009 — deferred] |
 | EPIC-5 | — | Volunteer matching & alerting | The dispatcher can find nearby volunteers, send a tiered alert, see it widen if unanswered, track live status per volunteer, and see a full audit trail | REQ-F-006..010 (full), 012 (full), 031, 032 | Phase 2 |
-| EPIC-6 | — | Certification, availability & privacy | A volunteer can upload/maintain certification, get expiry reminders, set availability, and give location consent; admin can see registry history | REQ-F-016..020, 023, 035 (full), REQ-N-009, 010, 011, 018 | Phase 2 |
-| EPIC-7 | — | Real push delivery | A volunteer receives a real, trackable push alert that best-effort bypasses silent/DND mode | REQ-F-021 (full), 022, 033, 034, REQ-N-001 | Phase 2 |
-| EPIC-8 | — | Country portability & admin tools | The system can be configured and operated per country, and admins can manage volunteers, certifications, and reference content | REQ-F-036..039, REQ-N-004, 012..016 | Phase 2 |
+| EPIC-6 | — | Certification, availability & privacy | A volunteer can upload/maintain certification, get expiry reminders, set availability, and give location consent; admin can see registry history | REQ-F-016..020, 023, 035 (full), REQ-N-009, 010, 011, 018 | Phase 2 (US-213 only) / **Phase 3** (rest) [CHG-009] |
+| EPIC-7 | — | Real push delivery | A volunteer receives a real, trackable push alert that best-effort bypasses silent/DND mode | REQ-F-021 (full), 022, 033, 034, REQ-N-001 | Phase 2 (US-216, US-218) / **Phase 3** (US-217) [CHG-009] |
+| EPIC-8 | — | Country portability & admin tools | The system can be configured and operated per country, and admins can manage volunteers, certifications, and reference content | REQ-F-036..039, REQ-N-004, 012..016 | **Phase 3** [CHG-009 — deferred] |
 
 ---
 
@@ -288,11 +288,11 @@ None this round. Everything identified as needing real backend logic, auth, or u
   - Given valid credentials for an admin account, when the user logs in, then they reach the console with admin-level access (oversight of all dispatchers and incidents, per REQ-F-001 [CHG-005]).
   - Given invalid credentials, when the user attempts to log in, then access is denied with a generic "invalid credentials" message (no hint about which field was wrong).
   - Rule: least-privilege applies (REQ-N-007) — a dispatcher account never sees admin-only screens or actions, regardless of URL/API access attempts.
-- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-4 · **Traces to:** REQ-F-001, REQ-N-007
 - **Grounding:** Direct
 - **Depends on / Blocked by:** —
-- **Status:** Ready
+- **Status:** Deferred to Phase 3 [CHG-009] — not needed to make the core notification loop (EPIC-5/7) real; Phase 1 already proved the dispatcher side works without login.
 - **Delivery status:** Not started
 - **Notes:** Encryption scope (REQ-N-006) and audit logging (REQ-N-008) apply to this story's login flow but are tracked as cross-cutting NFRs below (see "Non-functional requirements — Phase 2"), not as separate acceptance criteria here, since their precise scope is still open (OQ-010 for encryption).
 
@@ -304,11 +304,11 @@ None this round. Everything identified as needing real backend logic, auth, or u
   - Given a correct second factor, when submitted, then the user reaches the console.
   - Given an incorrect second factor, when submitted, then access is denied and the user may retry.
   - Rule: MFA is required for every dispatcher and admin account, no opt-out (REQ-N-005).
-- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-4 · **Traces to:** REQ-N-005
 - **Grounding:** Direct
 - **Depends on / Blocked by:** US-201
-- **Status:** Ready
+- **Status:** Deferred to Phase 3 [CHG-009] — explicitly deferred by Mohamed; builds on US-201 (also deferred).
 - **Delivery status:** Not started
 - **Notes:** The specific MFA mechanism (SMS, authenticator app, email code, etc.) is not specified in the requirements — that choice is left to the development team, same principle as the OQ-003/004/005/006 resolutions (CHG-006/007/008/004): the requirement is that a second factor exists, not which one.
 
@@ -319,11 +319,11 @@ None this round. Everything identified as needing real backend logic, auth, or u
   - Given the admin is logged in, when they open the oversight view, then they see a list of all dispatchers and, for each, their currently open and recently closed incidents.
   - Given the admin selects a specific incident from this view, when they open it, then they see the same incident detail a dispatcher would see (REQ-F-012 full audit trail included).
   - Given a dispatcher (not admin) attempts to reach this view directly, when they try, then access is denied (least-privilege, REQ-N-007).
-- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-4 · **Traces to:** REQ-F-001
 - **Grounding:** Direct
-- **Depends on / Blocked by:** US-201, US-209 (full audit trail feeds the incident detail shown here)
-- **Status:** Ready
+- **Depends on / Blocked by:** US-201 (also deferred)
+- **Status:** Deferred to Phase 3 [CHG-009] — depends on login (US-201), which is deferred.
 - **Delivery status:** Not started
 
 ---
@@ -334,7 +334,7 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Type:** Story
 - **Story:** As a dispatcher, I want to see which trained volunteers are available within configurable radius bands around the patient, so that I know who I could alert before sending anything.
 - **Acceptance criteria:**
-  - Given an incident with a location set, when the dispatcher opens the nearby-volunteers view, then volunteers are listed grouped by radius band (e.g. inner/outer band), each band's distance configurable per country (REQ-N-016).
+  - Given an incident with a location set, when the dispatcher opens the nearby-volunteers view, then volunteers are listed grouped by radius band (e.g. inner/outer band), with band distances set as simple system-wide configuration for now (not per-country — see Notes).
   - Given a volunteer's availability is set to "do-not-disturb" (REQ-F-019), when the search runs, then that volunteer is excluded from the results.
   - Given no volunteers are found within any configured band, when the dispatcher opens the view, then an explicit "no volunteers found nearby" state is shown, not an empty/broken list.
 - **Priority:** Must · **Size:** L (provisional) · **Phase/Sprint:** Phase 2
@@ -343,7 +343,7 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Depends on / Blocked by:** —
 - **Status:** Ready
 - **Delivery status:** Not started
-- **Notes:** REQ-N-017 (sub-second response) is a performance target on this story's search — tracked under "Non-functional requirements — Phase 2" below, not as a pass/fail acceptance criterion, since "sub-second" isn't precisely defined yet (OQ-007, open). The specific geospatial database/indexing technology is a development-team decision (OQ-003 resolved — CHG-006), not specified here.
+- **Notes:** [CHG-009] Per-country-configurable radius bands (REQ-N-016) is deferred along with the rest of country portability (EPIC-8) — build with one simple, system-wide set of radius bands for now; making it per-country configurable is a Phase 3 extension, not a rebuild. Also, since background-location consent/tracking (US-214) is deferred, this search uses each volunteer's registered/last-known location rather than continuous live GPS — flag this as a stated simplification, not an invented requirement. REQ-N-017 (sub-second response) is a performance target — tracked under "Non-functional requirements — Phase 2" below, not a pass/fail criterion, since "sub-second" isn't precisely defined yet (OQ-007, open). The specific geospatial database/indexing technology is a development-team decision (OQ-003 resolved — CHG-006).
 
 ### US-205 — Send an alert to identified volunteers
 - **Type:** Story
@@ -363,7 +363,7 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Story:** As a dispatcher, I want the alert to go to certified responders first, so that the most qualified volunteers get the first chance to respond.
 - **Acceptance criteria:**
   - Given nearby volunteers span more than one tier, when an alert is sent, then certified/verified CPR-BLS volunteers are notified first, ahead of healthcare-professional and willing-but-untrained tiers (REQ-F-008, tier breakdown confirmed — OQ-001 [CHG-003]).
-  - Rule: tiering/ordering/distance rules are configurable per country (REQ-F-032, REQ-N-016) — not hard-coded to one country's ordering.
+  - Rule: tiering/ordering/distance rules use one simple, system-wide configuration for now — per-country configurability (REQ-N-016, EPIC-8) is deferred to Phase 3 [CHG-009], not built here.
 - **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 2
 - **Epic:** EPIC-5 · **Traces to:** REQ-F-008, REQ-F-032
 - **Grounding:** Derived — rests on AS-001 (an open assumption: whether the brief's "trained volunteers" phrase in the core flow means the same as the "certified" tier). AS-001 was not resolved by CHG-003 (see 01-requirements-structured-v1.md §6) and remains a standing assumption; flag to Mohamed if it needs explicit confirmation before build.
@@ -375,9 +375,9 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Type:** Story
 - **Story:** As a dispatcher, I want the system to automatically widen the alert to the next tier if nobody accepts in time, so that the patient isn't left waiting on a pool that isn't responding.
 - **Acceptance criteria:**
-  - Given a tier has been notified and a configurable time window (N seconds, set per country) elapses with no acceptance, when the window expires, then the next broader tier is notified.
+  - Given a tier has been notified and a configurable time window (N seconds) elapses with no acceptance, when the window expires, then the next broader tier is notified.
   - Given a volunteer in the original tier accepts just as the window is about to expire, when the acceptance is recorded before expiry, then widening does not occur.
-  - Rule: the widening window (N) and the widening order are configurable, not hard-coded to one value or one tier sequence (REQ-F-009, REQ-N-016).
+  - Rule: the widening window (N) and the widening order are configurable system-wide (REQ-F-009), not hard-coded — but not per-country yet; per-country configurability (REQ-N-016) is deferred with the rest of country portability [CHG-009].
 - **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 2
 - **Epic:** EPIC-5 · **Traces to:** REQ-F-009
 - **Grounding:** Direct
@@ -402,7 +402,7 @@ None this round. Everything identified as needing real backend logic, auth, or u
 
 ### US-209 — Full dispatch audit trail
 - **Type:** Story
-- **Story:** As a dispatcher or admin, I want a complete, viewable record of everything that happened during a dispatch, so that we can review or account for what occurred after the fact.
+- **Story:** As a dispatcher, I want a complete, viewable record of everything that happened during a dispatch, so that we can review or account for what occurred after the fact.
 - **Acceptance criteria:**
   - Given an incident has been through any dispatch activity, when the audit trail is viewed, then it shows who was notified, when, who responded and how, and the final outcome, in chronological order.
   - Given an incident is still open, when the audit trail is viewed, then it reflects events up to the current moment (not just a post-closure summary).
@@ -412,7 +412,7 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Depends on / Blocked by:** US-205
 - **Status:** Ready
 - **Delivery status:** Not started
-- **Notes:** REQ-N-010 (patient location shall not be retained longer than necessary) applies to this trail's data — the precise retention period is OQ-009 (open); do not implement an automatic-deletion job against a guessed number. Build the audit trail itself now; wire in the retention/deletion policy once OQ-009 is answered.
+- **Notes:** [CHG-009] Written for the dispatcher only for now — the admin cross-incident view that also consumed this trail (US-203) is deferred to Phase 3; nothing here needs to change when that lands, it just gets a second consumer later. REQ-N-010 (patient location shall not be retained longer than necessary) applies to this trail's data — the precise retention period is OQ-009 (open); do not implement an automatic-deletion job against a guessed number. Build the audit trail itself now; wire in the retention/deletion policy once OQ-009 is answered.
 
 ---
 
@@ -424,11 +424,11 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Acceptance criteria:**
   - Given the volunteer is signed up, when they upload a certification document (image or PDF), then it is stored against their account with status "pending verification."
   - Given the volunteer attempts to upload an unsupported file type, when they try, then the upload is rejected with a message stating the supported formats.
-- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-6 · **Traces to:** REQ-F-016
 - **Grounding:** Direct
 - **Depends on / Blocked by:** —
-- **Status:** Ready
+- **Status:** Deferred to Phase 3 [CHG-009] — the tiered-alert logic (US-206) already works off a volunteer's self-declared tier from Phase 1 sign-up (US-101), same as Phase 1 did; formal certification verification is a trust/compliance improvement, not required to make alerting work.
 - **Delivery status:** Not started
 
 ### US-211 — Track certification expiry
@@ -437,11 +437,11 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Acceptance criteria:**
   - Given a volunteer's certification has an expiry date, when that date passes, then the certification is flagged "expired" on the volunteer's record and to any admin viewing it.
   - Given a certification is not yet expired, when viewed, then its status remains "valid" with the expiry date shown.
-- **Priority:** Must · **Size:** S (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Must · **Size:** S (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-6 · **Traces to:** REQ-F-017
 - **Grounding:** Direct
-- **Depends on / Blocked by:** US-210
-- **Status:** Ready (conditional — see Notes)
+- **Depends on / Blocked by:** US-210 (also deferred)
+- **Status:** Deferred to Phase 3 [CHG-009] — depends on certification upload (US-210), which is deferred; also still rests on OQ-014 (see original Notes).
 - **Delivery status:** Not started
 - **Notes:** What actually happens once flagged expired — demoted to a lower tier, excluded from alerts entirely, or something else — is OQ-014 (open). This story covers tracking and flagging only; do not invent the downstream consequence. Raise the consequence behaviour as its own story once OQ-014 is answered.
 
@@ -451,11 +451,11 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Acceptance criteria:**
   - Given a volunteer's certification is approaching its expiry date, when the reminder trigger point is reached, then the volunteer receives a reminder (channel/timing per dev's implementation).
   - Given a volunteer re-verifies before expiry, when they do, then no further reminders are sent for that certification cycle.
-- **Priority:** Should · **Size:** S (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Should · **Size:** S (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-6 · **Traces to:** REQ-F-018
 - **Grounding:** Direct
-- **Depends on / Blocked by:** US-211
-- **Status:** Ready
+- **Depends on / Blocked by:** US-211 (also deferred)
+- **Status:** Deferred to Phase 3 [CHG-009] — depends on certification expiry tracking (US-211), which is deferred.
 - **Delivery status:** Not started
 - **Notes:** Exact timing/channel of the reminder isn't specified in the brief — left to the dev team, same principle as the delegated technical OQs.
 
@@ -479,11 +479,11 @@ None this round. Everything identified as needing real backend logic, auth, or u
   - Given the volunteer is asked for background-location consent, when they grant it, then a consent record is stored with a timestamp (REQ-F-023) and location collection begins only from that point.
   - Given the volunteer declines consent, when they do, then no background location is collected, and the app states this may limit how they're matched to nearby incidents.
   - Rule: location is collected only while an incident/event is active, or with explicit opt-in otherwise (REQ-N-011) — never collected silently in the background outside those cases.
-- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-6 · **Traces to:** REQ-F-020, REQ-F-023, REQ-N-011
 - **Grounding:** Direct
 - **Depends on / Blocked by:** —
-- **Status:** Ready
+- **Status:** Deferred to Phase 3 [CHG-009] — continuous background-location tracking is real infrastructure, not needed for the simple core loop. US-204's nearby-volunteer search uses each volunteer's registered/last-known location instead for now (see US-204's Notes) — a stated simplification, not silently dropped scope.
 - **Delivery status:** Not started
 - **Notes:** REQ-N-018 (battery-friendly tracking) applies here — "battery-friendly" isn't precisely defined (OQ-008, open); tracked under "Non-functional requirements — Phase 2" below rather than a specific sampling-interval number invented here.
 
@@ -493,11 +493,11 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Acceptance criteria:**
   - Given a volunteer has had tier, status, or certification changes over time, when an admin opens their profile, then a chronological history of those changes is shown, not just the current values.
   - Given a volunteer has no history yet (newly signed up), when viewed, then the history shows only the sign-up event.
-- **Priority:** Should · **Size:** M (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Should · **Size:** M (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-6 · **Traces to:** REQ-F-035 (full — extends Phase 1's ENABLER-003 read-only, no-history endpoint)
 - **Grounding:** Direct
 - **Depends on / Blocked by:** —
-- **Status:** Ready
+- **Status:** Deferred to Phase 3 [CHG-009] — an admin-facing view; admin (US-203) is deferred, and this was already "Should" priority, lowest urgency in this epic.
 - **Delivery status:** Not started
 
 ---
@@ -525,17 +525,17 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Acceptance criteria:**
   - Given the volunteer's device is in silent/DND mode and platform settings allow an override, when an alert is sent, then the notification attempts to bypass silent/DND (REQ-F-022, best-effort — Should priority, not Must).
   - Given the platform or the user's own settings do not allow an override, when an alert is sent, then the notification is still delivered through the normal channel (no error), even if it doesn't audibly interrupt DND.
-- **Priority:** Should · **Size:** M (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Should · **Size:** M (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-7 · **Traces to:** REQ-F-022
 - **Grounding:** Direct
-- **Depends on / Blocked by:** US-216
-- **Status:** Ready
+- **Depends on / Blocked by:** US-216 (which stays in Phase 2)
+- **Status:** Deferred to Phase 3 [CHG-009] — a best-effort ("Should") enhancement on top of basic push (US-216); get plain delivery working first.
 - **Delivery status:** Not started
 - **Notes:** The specific technical mechanism for maximising DND-bypass reliability is delegated to the development team (OQ-004 resolved — CHG-007); this story only specifies the functional behaviour, not the implementation.
 
 ### US-218 — Track push delivery status
 - **Type:** Story
-- **Story:** As a dispatcher or admin, I want to know whether a push alert actually reached each volunteer, so that I can tell a real non-response apart from a delivery failure.
+- **Story:** As a dispatcher, I want to know whether a push alert actually reached each volunteer, so that I can tell a real non-response apart from a delivery failure.
 - **Acceptance criteria:**
   - Given an alert has been sent to a volunteer, when delivery is attempted, then the system records "delivered" or "not reached" per volunteer per alert (REQ-F-034).
   - Given a volunteer's delivery status is "not reached," when the dispatcher views that volunteer's status (US-208), then this is visibly distinguished from "notified but no response yet."
@@ -556,11 +556,11 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Acceptance criteria:**
   - Given a user's account is tied to a country, when they view incidents or volunteers, then only records from their own country are shown.
   - Rule: the underlying data is partitioned per country at the storage level (REQ-F-036, REQ-N-004), extending Phase 1's ENABLER-002 datastore shape (which was built with this partitioning in mind but not enforced).
-- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-8 · **Traces to:** REQ-F-036, REQ-N-004
 - **Grounding:** Direct
 - **Depends on / Blocked by:** —
-- **Status:** Ready
+- **Status:** Deferred to Phase 3 [CHG-009] — country portability (the whole of EPIC-8) is explicitly deferred; the system runs single-country for now.
 - **Delivery status:** Not started
 
 ### US-220 — Configure country-specific settings
@@ -570,11 +570,11 @@ None this round. Everything identified as needing real backend logic, auth, or u
   - Given the admin opens country settings, when they set the display language, then the console and app content render in that language for users in that country.
   - Given the admin sets the local address format and units of measurement, when incidents/volunteers are displayed, then addresses and distances render in that country's configured format/units.
   - Given the admin sets the local emergency number, when it's referenced anywhere in the app/console, then the configured number is shown, not a hard-coded default.
-- **Priority:** Must · **Size:** L (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Must · **Size:** L (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-8 · **Traces to:** REQ-N-012, REQ-N-013, REQ-N-014, REQ-N-015
 - **Grounding:** Direct
-- **Depends on / Blocked by:** US-219
-- **Status:** Ready
+- **Depends on / Blocked by:** US-219 (also deferred)
+- **Status:** Deferred to Phase 3 [CHG-009] — country portability deferred; this was also flagged as the single largest/riskiest story in the original draft (bundles 4 requirements), worth splitting when it's actually picked up.
 - **Delivery status:** Not started
 - **Notes:** The technical mechanism for this configurability (e.g. how the Countries/Config module is internally shaped) is delegated to the development team (OQ-005 resolved — CHG-008); this story specifies only the functional/admin-facing behaviour.
 
@@ -584,11 +584,11 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Acceptance criteria:**
   - Given the admin opens alerting-rule settings for their country, when they set the tier order and radius-band distances, then subsequent alerts in that country follow the configured order/distances (feeds US-204, US-206).
   - Given no country-specific override is set, when an alert runs, then a documented default order/distance is used rather than failing or behaving unpredictably.
-- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-8 · **Traces to:** REQ-N-016, REQ-F-032
 - **Grounding:** Direct
-- **Depends on / Blocked by:** US-219, US-206
-- **Status:** Ready
+- **Depends on / Blocked by:** US-219 (also deferred), US-206 (stays in Phase 2, runs on a simple system-wide config until this lands)
+- **Status:** Deferred to Phase 3 [CHG-009] — country portability deferred; US-206/US-207 use one simple system-wide configuration in the meantime.
 - **Delivery status:** Not started
 
 ### US-222 — Admin manages volunteers
@@ -597,11 +597,11 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Acceptance criteria:**
   - Given the admin opens the volunteer management view, when they select a volunteer, then they can view full details and toggle the account between active and deactivated.
   - Given a volunteer is deactivated, when a nearby-volunteer search runs (US-204), then that volunteer is excluded from results.
-- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-8 · **Traces to:** REQ-F-037
 - **Grounding:** Direct
 - **Depends on / Blocked by:** —
-- **Status:** Ready
+- **Status:** Deferred to Phase 3 [CHG-009] — admin tooling; admin (US-203) is deferred.
 - **Delivery status:** Not started
 - **Notes:** What happens to an in-flight incident if a notified/accepted volunteer's account is deactivated mid-response is OQ-014 (open, shared with US-211) — do not invent that behaviour here.
 
@@ -611,11 +611,11 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Acceptance criteria:**
   - Given a volunteer has uploaded a certification with status "pending verification" (US-210), when the admin reviews it, then they can mark it "verified" or "rejected" with an optional reason.
   - Given a certification is marked "verified," when the volunteer's tier depends on it, then their tier status reflects "verified" rather than "pending."
-- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-8 · **Traces to:** REQ-F-038
 - **Grounding:** Direct
-- **Depends on / Blocked by:** US-210
-- **Status:** Ready
+- **Depends on / Blocked by:** US-210 (also deferred)
+- **Status:** Deferred to Phase 3 [CHG-009] — depends on certification upload (US-210) and admin (US-203), both deferred.
 - **Delivery status:** Not started
 
 ### US-224 — Admin manages in-app reference content
@@ -624,67 +624,69 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Acceptance criteria:**
   - Given the admin opens content management, when they edit the CPR/AED reference text, then the updated content is what volunteers see in the app's reference section (US-105) without an app update.
   - Given the admin saves invalid/empty content, when they try, then the save is rejected and the previous content remains live.
-- **Priority:** Should · **Size:** S (provisional) · **Phase/Sprint:** Phase 2
+- **Priority:** Should · **Size:** S (provisional) · **Phase/Sprint:** Phase 3 [CHG-009 — deferred from Phase 2]
 - **Epic:** EPIC-8 · **Traces to:** REQ-F-039
 - **Grounding:** Direct
 - **Depends on / Blocked by:** —
-- **Status:** Ready
+- **Status:** Deferred to Phase 3 [CHG-009] — admin tooling, lowest urgency ("Should"), no dependents.
 - **Delivery status:** Not started
 
 ---
 
 ## Non-functional requirements — Phase 2 (tracked, not individually story'd)
 
-These are cross-cutting quality targets rather than standalone user stories (per the product-backlog skill: technical/system qualities aren't forced into "As a user..." format). Each is tied to the story/epic it constrains; the delivery team should treat these as ongoing engineering constraints on the stories above, not one-off tickets.
+These are cross-cutting quality targets rather than standalone user stories (per the product-backlog skill: technical/system qualities aren't forced into "As a user..." format). Each is tied to the story/epic it constrains; the delivery team should treat these as ongoing engineering constraints on the stories above, not one-off tickets. **[CHG-009]** Most NFRs below moved to Phase 3 along with the stories they were attached to (auth, country config, cert/admin tooling); only what still applies to the trimmed Phase 2 scope is listed here.
 
 | Requirement | Constrains | Status |
 |-------------|-----------|--------|
 | REQ-N-002 (99.9% uptime, dispatch path) | EPIC-5 (US-204..209) | Open — no blocking OQ, but no measurement approach defined yet either; track alongside OQ-015. |
-| REQ-N-003 (graceful degradation if a dependency fails) | EPIC-5, EPIC-7 | Open — no blocking OQ; standard engineering practice, not a story. |
-| REQ-N-006 (encryption "everywhere") | EPIC-4 (US-201) and all data flows | Blocked on OQ-010 (precise scope: transit only / at rest / which fields / key management) — build at minimum HTTPS in transit (already CON-004/005); do not guess at broader scope. |
-| REQ-N-007 (least-privilege access control) | EPIC-4 (US-201, US-203) | Covered directly in US-201/US-203 acceptance criteria — not open. |
-| REQ-N-008 (security audit logging) | EPIC-4 and all admin/security actions | Open — no blocking OQ; distinct from REQ-F-012's dispatch audit trail (US-209). Log logins, role changes, cert verification/rejection (US-223), volunteer activation/deactivation (US-222). |
+| REQ-N-003 (graceful degradation if a dependency fails) | EPIC-5, EPIC-7 (US-216, US-218) | Open — no blocking OQ; standard engineering practice, not a story. |
 | REQ-N-017 (sub-second nearby-volunteer search) | EPIC-5 (US-204) | Blocked on OQ-007 (precise definition of "sub-second" — under what concurrency/region/volunteer-count). |
-| REQ-N-018 (battery-friendly background location) | EPIC-6 (US-214) | Blocked on OQ-008 (precise definition — target sampling interval or battery-drain budget). |
+
+Deferred to Phase 3 with their stories: REQ-N-006 (encryption), REQ-N-007 (least-privilege), REQ-N-008 (audit logging) — all attached to EPIC-4 (deferred); REQ-N-018 (battery-friendly location) — attached to US-214 (deferred); REQ-N-004, REQ-N-012..016 (country portability) — attached to EPIC-8 (deferred).
 
 ---
 
 ## Suggested build order — Phase 2
 
-Phase 2 has real cross-story dependencies (unlike Phase 1's three independent mocked slices), so this order matters more than Phase 1's did:
+Phase 2 is now just the simple core loop (9 stories), so the order is short:
 
-1. **US-201** (login) → 2. **US-202** (MFA) → 3. **US-203** (admin oversight) — auth has to exist before anything role-gated.
-4. **US-219** (country-scoped data visibility) → 5. **US-220** (country settings) → 6. **US-221** (country alerting rules) — the country-partitioning foundation should land before the matching/alerting logic that depends on per-country config.
-7. **US-204** (nearby volunteers) → 8. **US-206** (tiered order) → 9. **US-205** (send alert) → 10. **US-207** (widen pool) → 11. **US-208** (live status) → 12. **US-209** (audit trail) — the core dispatch loop, in dependency order.
-13. **US-216** (real push) → 14. **US-217** (DND bypass) → 15. **US-218** (delivery tracking) — push delivery, once there's an alert-send path (step 9) to hook into.
-16. **US-210** (upload cert) → 17. **US-223** (admin verifies cert) → 18. **US-211** (track expiry) → 19. **US-212** (expiry reminder) → 20. **US-213** (availability) → 21. **US-214** (location consent) → 22. **US-215** (volunteer history) — certification/availability/privacy track, largely independent of the dispatch loop above and can run in parallel with it.
-23. **US-222** (admin manages volunteers) → 24. **US-224** (admin manages reference content) — remaining admin tools, lowest urgency, can slot in anytime.
+1. **US-204** (nearby volunteers) → 2. **US-206** (tiered order) → 3. **US-205** (send alert) → 4. **US-207** (widen pool) → 5. **US-208** (live status) → 6. **US-209** (audit trail) — the core dispatch loop, in dependency order.
+7. **US-216** (real push) → 8. **US-218** (delivery tracking) — push delivery, once there's an alert-send path (step 3) to hook into.
+9. **US-213** (availability) — independent of the dispatch loop, can be built any time in parallel (feeds an exclusion rule into US-204).
 
 ## Dependencies overview — Phase 2
 
 | Story | Depends on | Reason |
 |-------|-----------|--------|
-| US-202 | US-201 | MFA is a second step of the same login flow |
-| US-203 | US-201, US-209 | Needs login, and needs the full audit trail to show incident detail |
 | US-205 | US-204, US-206 | Needs to know who's nearby and in what tier order before sending |
 | US-207 | US-206 | Widening operates on the same tier sequence |
 | US-208 | US-205 | Status view only makes sense once an alert has been sent |
 | US-209 | US-205 | Audit trail records events starting from alert send |
 | US-216 | US-205 | Push delivers the alert that US-205 triggers |
-| US-217 | US-216 | DND bypass is a property of the same push delivery |
 | US-218 | US-216 | Tracks delivery of the same push |
-| US-211 | US-210 | Can't track expiry of a certification that hasn't been uploaded |
-| US-212 | US-211 | Reminder trigger depends on expiry tracking existing |
-| US-220 | US-219 | Country settings apply within the country-partitioning foundation |
-| US-221 | US-219, US-206 | Country alerting rules configure the same tiering used in US-206 |
-| US-223 | US-210 | Can't verify a certification that hasn't been uploaded |
 
 ## Items sent back — Phase 2 (not turned into stories)
 
 - **AED-fetch flow / AED registry** — still explicitly out of scope per the brief; blocked on OQ-002 (AED data sourcing), which remains unresolved. Not drafted as a story.
 - **Reporting & analytics** — still explicitly deferred per the brief; no requirements captured for it yet (would need its own requirements-structuring pass before it could become a story).
 - **iOS volunteer app** — still "Android only for now" (CON-001); no story drafted.
-- **Volunteer back-out-after-accepting behaviour, offline/force-closed device handling, and certification-expiry consequences** — these would need OQ-013, OQ-012, and OQ-014 resolved respectively before they can become real acceptance criteria; flagged inline on US-208, US-216, and US-211/US-222 above rather than invented.
+- **Volunteer back-out-after-accepting behaviour, offline/force-closed device handling, and certification-expiry consequences** — these would need OQ-013, OQ-012, and OQ-014 resolved respectively before they can become real acceptance criteria; flagged inline on US-208, US-216 above rather than invented.
+
+---
+
+## Phase 3 (deferred, CHG-009) — auth, certification, country portability, admin tools
+
+Fifteen stories, fully written with specs, kept exactly as drafted — nothing deleted, IDs unchanged, ready to pick up whenever this work is prioritized. Reassigned from Phase 2 on 2026-07-13 because none of them are needed to make the simple core notification loop (find volunteer → alert → notify → respond → track) work; they add real auth/security/i18n/admin infrastructure on top of it.
+
+**EPIC-4 — Authentication & roles:** US-201 (login), US-202 (MFA), US-203 (admin oversight).
+**EPIC-6 remainder — Certification & privacy:** US-210 (upload cert), US-211 (track expiry), US-212 (expiry reminder), US-214 (location consent), US-215 (volunteer history).
+**EPIC-7 remainder:** US-217 (DND bypass).
+**EPIC-8 — Country portability & admin tools:** US-219 (country-scoped data), US-220 (country settings), US-221 (country alerting rules), US-222 (admin manages volunteers), US-223 (admin verifies certs), US-224 (admin manages content).
+
+**Suggested order whenever Phase 3 is picked up:** 1. US-201 → 2. US-202 → 3. US-203 (auth foundation first, everything else in this bucket is role-gated) → 4. US-219 → 5. US-220 → 6. US-221 (country foundation) → 7. US-210 → 8. US-223 → 9. US-211 → 10. US-212 (certification lifecycle) → 11. US-214 → 12. US-215 → 13. US-217 → 14. US-222 → 15. US-224 (remaining, lowest urgency).
+
+**Note for whoever picks this up:** US-220 was already flagged as oversized (bundles 4 requirements) — split it before sprinting on it.
 
 ## Definition of Ready / Done
 

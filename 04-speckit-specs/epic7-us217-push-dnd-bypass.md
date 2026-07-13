@@ -5,6 +5,7 @@
 **Traces to:** REQ-F-022
 **Date:** 2026-07-13
 **Produced by:** speckit-spec skill
+**Status:** Deferred to Phase 3 [CHG-009, 2026-07-13] — a best-effort enhancement on top of basic push (US-216, which stays in Phase 2). Kept as-is, ready to pick up later.
 
 ---
 

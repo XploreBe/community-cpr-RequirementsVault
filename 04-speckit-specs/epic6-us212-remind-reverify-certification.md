@@ -5,6 +5,7 @@
 **Traces to:** REQ-F-018
 **Date:** 2026-07-13
 **Produced by:** speckit-spec skill
+**Status:** Deferred to Phase 3 [CHG-009, 2026-07-13] — depends on certification expiry tracking (US-211), also deferred. Kept as-is, ready to pick up later.
 
 ---
 

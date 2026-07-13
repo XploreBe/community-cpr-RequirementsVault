@@ -5,6 +5,7 @@
 **Traces to:** REQ-N-005
 **Date:** 2026-07-13
 **Produced by:** speckit-spec skill
+**Status:** Deferred to Phase 3 [CHG-009, 2026-07-13] — not part of the current Phase 2 round. Kept as-is, ready to pick up once basic login (US-201) is prioritized.
 
 ---
 

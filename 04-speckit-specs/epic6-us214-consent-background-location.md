@@ -5,6 +5,7 @@
 **Traces to:** REQ-F-020, REQ-F-023, REQ-N-011
 **Date:** 2026-07-13
 **Produced by:** speckit-spec skill
+**Status:** Deferred to Phase 3 [CHG-009, 2026-07-13] — continuous background-location tracking is real infrastructure, not needed for the simple core loop. US-204's nearby search uses each volunteer's registered/last-known location in the meantime. Kept as-is, ready to pick up later.
 
 ---
 

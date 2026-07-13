@@ -31,6 +31,7 @@ Given an incident has just been created with no dispatch activity yet, when the 
 
 - Requires US-205 (send alert) — the trail records events starting from alert send onward, building on the incident-creation record already in Phase 1's US-003.
 - This is distinct from REQ-N-008's security audit logging (logins, role changes, admin actions) — this trail is specifically the per-incident dispatch record.
+- [CHG-009] Built for the dispatcher view only for now — the admin cross-incident oversight view that also reads this trail (US-203) is deferred to Phase 3; no rework needed here when that lands, it's just a second consumer of the same data.
 
 ---
 

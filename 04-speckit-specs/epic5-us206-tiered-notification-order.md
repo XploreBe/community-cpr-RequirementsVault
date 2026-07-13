@@ -22,8 +22,8 @@ Given nearby volunteers span more than one tier, when an alert is sent, then cer
 ### Scenario 2 — Single-tier case (edge case)
 Given all nearby volunteers happen to be in the same tier, when an alert is sent, then they are all notified together — there is no artificial delay waiting for a "next tier" that doesn't apply.
 
-### Scenario 3 — Country-configurable ordering
-Tiering, ordering, and distance rules are configurable per country (REQ-F-032, REQ-N-016) — the tier sequence used is read from that country's configuration, not hard-coded to one fixed global order.
+### Scenario 3 — Configurable ordering
+Tiering and ordering rules are configurable (REQ-F-032) rather than hard-coded in application logic — read from one simple, system-wide configuration for now.
 
 ---
 
@@ -31,14 +31,14 @@ Tiering, ordering, and distance rules are configurable per country (REQ-F-032, R
 
 - Final tier breakdown confirmed (OQ-001 resolved — CHG-003): certified/verified CPR-BLS, healthcare professional (its own separate tier), willing-but-untrained.
 - Provisional assumption (to confirm with Mohamed, not resolved by CHG-003): AS-001 — whether the brief's "trained volunteers" phrase in the core flow description means the same thing as the "certified" tier. This was not addressed by the OQ-001 resolution and remains open; do not silently assume an answer beyond what's stated in 01-requirements-structured-v1.md §6.
-- The technical mechanism for per-country configuration (how the Countries/Config module is shaped) is a development-team decision (OQ-005 resolved — CHG-008).
+- [CHG-009] Per-country configurability (REQ-N-016) is deferred to Phase 3 along with the rest of country portability — build one system-wide tier order/config for now, not a per-country one.
 
 ---
 
 ## Out of scope
 
 - Sending the alert itself — US-205.
-- The country-settings admin UI used to configure the order — US-221.
+- Per-country configuration of tier order — deferred to Phase 3 (US-219..221).
 
 **Unresolved:**
 - AS-001 (see above) — flag to Mohamed for explicit confirmation if it materially affects how "trained volunteers" is matched against the certified tier before building.

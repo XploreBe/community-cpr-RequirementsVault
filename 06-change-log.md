@@ -8,6 +8,35 @@ Changes are listed newest first. Each entry is permanent — never deleted or ed
 
 ---
 
+## CHG-009 — Rescope Phase 2 to the simple core loop; defer auth/MFA, certification workflow, location consent, and country portability/admin tools to Phase 3
+**Date:** 2026-07-13
+**Triggered by:** Mohamed, same session as CHG-003..008 — after reviewing the first Phase 2 draft (24 stories), decided it was bigger than intended
+**Change type:** Scope change
+**Affected item:** 03-product-backlog-v1.md (EPIC-4 through EPIC-8); 02-scope-and-context-v1.md §4; 04-speckit-specs/ (15 spec files marked deferred); 05-traceability-matrix.md; 00-project-home.md
+**Old value:** All 24 Phase 2 stories (US-201..US-224) marked Status: Ready (or Ready-conditional) with Phase/Sprint: Phase 2.
+**New value:** 9 stories stay in Phase 2 (US-204, 205, 206, 207, 208, 209, 213, 216, 218 — the core loop: find nearby volunteers, send a tiered alert, widen if unanswered, live status, audit trail, availability, real push, delivery tracking). 15 stories reassigned to Phase 3, Status changed to "Deferred to Phase 3 [CHG-009]": US-201, 202, 203 (login/MFA/admin oversight), US-210, 211, 212, 214, 215 (certification workflow, location consent, volunteer history), US-217 (DND bypass), US-219, 220, 221, 222, 223, 224 (country portability + admin tools). No story was deleted; all IDs, content, and spec files are kept intact per CLAUDE.md's "IDs are permanent" rule — only the Status/Phase field and a small number of acceptance criteria referencing now-deferred capabilities were edited (see Items updated).
+**Reason:** Mohamed's brief was "keep Phase 2 simple, like the volunteer sets availability and it's respected" — not a full real-auth, real-i18n, real-cert-lifecycle system. The first draft over-applied "grounded in a requirement = must build now": MFA and country configurability are genuinely required by the brief eventually (REQ-N-005, REQ-N-012..016), but being in the brief doesn't mean they have to ship in this round, the same way iOS and e2e-tests were deferred without being cut from the requirements in Phase 1. Deferring is a phasing decision, not a requirements change — nothing in 01-requirements-structured-v1.md was touched.
+**Resolves:** —
+
+### Items updated
+- `03-product-backlog-v1.md` — Epics table: EPIC-4 and EPIC-8 marked Phase 3 in full; EPIC-6 and EPIC-7 split (partial Phase 2 / partial Phase 3). 15 stories' Status/Phase/Sprint fields changed to "Deferred to Phase 3 [CHG-009]" with a reason noted per story. 3 stories' acceptance criteria simplified to remove per-country-configurability language now that country portability is deferred (US-204, US-206, US-207 — read from one simple system-wide configuration instead). US-209 and US-218's story personas softened from "dispatcher or admin" to "dispatcher" since admin oversight (US-203) is deferred. New "Phase 3 (deferred, CHG-009)" section added with its own suggested build order for later. "Non-functional requirements — Phase 2" table trimmed to only what still applies; deferred NFRs noted as moved with their stories. "Suggested build order — Phase 2" and "Dependencies overview — Phase 2" trimmed to the 9 active stories.
+- `02-scope-and-context-v1.md` §4 — added a note pointing to this CHG and the new Phase 2/Phase 3 split; the theme description itself was left as originally scoped (this is a build-order decision, not a scope cut).
+- `04-speckit-specs/` — 15 spec files (epic4-us201/202/203, epic6-us210/211/212/214/215, epic7-us217, epic8-us219/220/221/222/223/224) each got a one-line "Status: Deferred to Phase 3 [CHG-009]" banner added under their header — content otherwise untouched. 3 active specs (epic5-us204/206/207) had their per-country-configuration language simplified to match the trimmed backlog ACs. epic5-us209 got a note that its admin consumer is deferred.
+- `04-speckit-specs/00-index.md` — reorganized into "Phase 2 (current round)" and "Phase 3 (deferred, CHG-009)" sections.
+- `05-traceability-matrix.md` — Phase columns updated for all affected REQ-F/REQ-N rows and the Story→Requirements reverse lookup to show which stories are Phase 2 (active) vs Phase 3 (deferred).
+- `00-project-home.md` — Phase 2 backlog-readiness table updated to reflect 9 active stories; added a Phase 3 (deferred) note.
+
+### Items reviewed — no change needed
+- `01-requirements-structured-v1.md` — no requirement was added, changed, or removed. This is a phasing/prioritization decision, not a requirements change; REQ-F-001, REQ-N-005, REQ-N-012..016, and all other requirements behind deferred stories remain valid and unchanged, just scheduled for Phase 3.
+- Phase 1 backlog (US-001..US-106, ENABLER-001..003) — entirely unaffected, this CHG only touches Phase 2.
+- `06-change-log.md` CHG-003 through CHG-008 — the six OQ resolutions stand as written; none of them are reversed or contradicted by this rescoping. OQ-003/004/005 (delegated to dev team) still apply to the Phase 3 stories they were tied to (US-219-221, US-217); OQ-001/006/011 still apply to the Phase 2 stories they unblocked (US-206, US-201 respectively — US-201 itself is now deferred, but the resolution stands).
+
+### Follow-up actions required
+- None to build Phase 2 now — the 9 active stories and their specs are ready as-is.
+- When Phase 3 is eventually picked up, split US-220 (configure country settings) before sprinting on it — it was already flagged in the original draft as bundling 4 requirements into one oversized story.
+
+---
+
 ## CHG-008 — Resolve OQ-005 (country-abstraction technical approach)
 **Date:** 2026-07-13
 **Triggered by:** Mohamed, session 2026-07-13 (pre-vacation Phase 2 prep)
