@@ -29,7 +29,7 @@ Given no maps app is available on the device, when "Navigate" is tapped, then th
 
 ## Constraints and assumptions
 
-- Provisional assumption (to confirm): uses Google Maps per the brief's text ("fine to lean on Google Maps for this"). This does not resolve OQ-006 — the architecture diagram shows the volunteer-app's navigation edge pointing to OpenStreetMap/MapLibre/OSRM instead. If that source is confirmed as the actual intended provider, this scenario needs to be rebuilt, not just reconfigured.
+- Uses Google Maps per the brief's text ("fine to lean on Google Maps for this"). OQ-006 is resolved [CHG-004]: navigation provider is a development-team implementation choice, not a fixed requirement — Google Maps as already built stands, no rework required.
 - Android-only, React Native (CON-001).
 
 ---
@@ -39,11 +39,11 @@ Given no maps app is available on the device, when "Navigate" is tapped, then th
 - In-app turn-by-turn rendering — this story hands off to an external maps app/intent, it does not build its own navigation UI.
 - Live rerouting or tracking the volunteer's progress toward the scene (not requested anywhere upstream).
 
-**Unresolved — dev should not implement until confirmed:**
-- OQ-006 (navigation provider conflict) — affects Scenario 1 directly. Implement against Google Maps as stated, but keep the maps integration isolated behind a small interface so switching providers later doesn't ripple through the rest of the app.
+**Unresolved:**
+- ~~OQ-006 (navigation provider conflict)~~ — RESOLVED [CHG-004]: provider is a dev decision, Google Maps as already built stands, no rework needed.
 
 ---
 
 ## Constitution snippet
 
-- Isolate the maps-provider integration behind an interface — OQ-006 is unresolved and a provider switch is a real possibility, not a hypothetical.
+- Isolate the maps-provider integration behind an interface. Provider is now a confirmed dev decision [CHG-004] rather than a fixed requirement, so keeping it swappable remains good practice if the dev team ever wants to change it.

@@ -55,8 +55,8 @@ Given the incident form is open, when the dispatcher submits with a latitude out
 - Tiered alerting, notifying volunteers, or any live-dispatch behavior triggered by creating an incident (Phase 2 — REQ-F-006..009).
 - Login/roles (Phase 2 — REQ-F-001).
 
-**Unresolved — dev should not implement until confirmed:**
-- None blocking this specific story. (Broader open questions such as OQ-001/OQ-005/OQ-006 affect other Phase 1 stories, not this one.)
+**Unresolved:**
+- None. (OQ-001, OQ-005, and OQ-006, which touched other Phase 1/Phase 2 stories, are all resolved — see 06-change-log.md CHG-003/004/008. None of them ever affected this story directly.)
 
 ---
 
