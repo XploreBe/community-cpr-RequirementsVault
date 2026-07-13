@@ -36,7 +36,7 @@ All Phase 1 stories are Ready, so every Phase 1 backlog item has a spec file bel
 
 - [[epic5-us204-nearby-volunteers-radius-bands|US-204 — See nearby volunteers within radius bands]]
 - [[epic5-us205-send-alert-to-volunteers|US-205 — Send an alert to identified volunteers]]
-- [[epic5-us206-tiered-notification-order|US-206 — Tiered notification order]] — Ready (conditional — rests on AS-001)
+- [[epic5-us206-tiered-notification-order|US-206 — Tiered notification order]] — Ready [CHG-010]
 - [[epic5-us207-widen-alert-pool|US-207 — Widen the alert pool after a timeout]]
 - [[epic5-us208-live-per-volunteer-status|US-208 — Live per-volunteer status view]]
 - [[epic5-us209-full-dispatch-audit-trail|US-209 — Full dispatch audit trail]]

@@ -1,7 +1,7 @@
 # Community CPR Volunteer Dispatch
 
-**Pipeline run:** 2026-07-06 (Phase 1); Phase 2 backlog + specs added 2026-07-13, then rescoped same day (CHG-009)
-**Status:** Phase 1 (walking skeleton) is fully structured, scoped, backlogged, and spec'd. **Phase 2 is now the simple core notification loop only** (9 stories) — find nearby volunteers, alert them in tiered order, widen if unanswered, live status, audit trail, availability, real push, delivery tracking. Everything else from the brief's real MVP (login/MFA, certification workflow, location consent, country portability, admin tools — 15 stories) is fully drafted but deliberately deferred to **Phase 3**, per CHG-009. Phase 2/3 use no repo tags and no enablers/spikes — the team consolidated into one repository and moved to spec-driven development at pickup time (see CLAUDE.md).
+**Pipeline run:** 2026-07-06 (Phase 1); Phase 2 backlog + specs added 2026-07-13, then rescoped same day (CHG-009); remaining open questions/assumption resolved same day (CHG-010 through CHG-017)
+**Status:** Phase 1 (walking skeleton) is fully structured, scoped, backlogged, and spec'd. **Phase 2 is now the simple core notification loop only** (9 stories, all fully Ready — no conditional items) — find nearby volunteers, alert them in tiered order, widen if unanswered, live status, audit trail, availability, real push, delivery tracking. Everything else from the brief's real MVP (login/MFA, certification workflow, location consent, country portability, admin tools — 15 stories) is fully drafted but deliberately deferred to **Phase 3**, per CHG-009. Phase 2/3 use no repo tags and no enablers/spikes — the team consolidated into one repository and moved to spec-driven development at pickup time (see CLAUDE.md).
 
 > **New here?** → [[00-how-to-use|How to use this vault]]
 
@@ -30,24 +30,24 @@ No Phase 1 story or enabler is blocked on an open question or a stated assumptio
 
 | Epic | Items | Ready | Ready (conditional) | Not Ready | Won't |
 |------|------:|------:|---------------------:|----------:|------:|
-| EPIC-5 — Volunteer matching & alerting | 6 | 5 | 1 | 0 | 0 |
+| EPIC-5 — Volunteer matching & alerting | 6 | 6 | 0 | 0 | 0 |
 | EPIC-6 (partial) — Volunteer availability (US-213 only) | 1 | 1 | 0 | 0 | 0 |
 | EPIC-7 (partial) — Real push delivery (US-216, US-218) | 2 | 2 | 0 | 0 | 0 |
-| **Total** | **9** | **8** | **1** | **0** | **0** |
+| **Total** | **9** | **9** | **0** | **0** | **0** |
 
-The one Phase 2 conditional item is **US-206 — Tiered notification order**, resting on AS-001 (an assumption about whether "trained volunteers" means the same as the "certified" tier — not resolved by any of the CHG-003..008 open-question resolutions).
+No Phase 2 item is conditional anymore. **US-206 — Tiered notification order** was the last one, resting on AS-001 (whether "trained volunteers" means the same as the "certified" tier). Resolved [CHG-010]: it means certified/verified CPR-BLS **and** healthcare professional combined.
 
 **Backlog readiness (Phase 3 — deferred, CHG-009)** — fully drafted and spec'd, not being built yet:
 
 | Epic | Items | Status |
 |------|------:|--------|
 | EPIC-4 — Authentication & roles | 3 | Deferred to Phase 3 |
-| EPIC-6 (remainder) — Certification & privacy | 5 | Deferred to Phase 3 (US-211 also rests on OQ-014, open) |
+| EPIC-6 (remainder) — Certification & privacy | 5 | Deferred to Phase 3 |
 | EPIC-7 (remainder) — DND bypass | 1 | Deferred to Phase 3 |
 | EPIC-8 — Country portability & admin tools | 6 | Deferred to Phase 3 |
 | **Total** | **15** | — |
 
-Several stories (in both phases) have unresolved open questions noted inline (OQ-007, 008, 009, 010, 012, 013, 014, 015) that affect a specific acceptance criterion or edge case without blocking the story as a whole — see each story's spec "Unresolved" section and [[05-traceability-matrix|traceability matrix]] §5.
+Only two open questions remain unresolved vault-wide: OQ-002 (AED data sourcing — a fully future, out-of-scope theme) and OQ-015 (how the 5s/95% delivery target and widening delay are measured/monitored in production — flagged in US-207/US-216's specs, not blocking either story). OQ-007, 008, 009, 010, 012, 013, and 014 were all resolved 2026-07-13 via CHG-011 through CHG-017 — see [[06-change-log|change log]] and [[05-traceability-matrix|traceability matrix]] §5.
 
 **Delivery progress** — what the team is actually building right now — is tracked directly in the backlog, not duplicated here: every story/enabler in [[03-product-backlog-v1|the product backlog]] has a **Delivery status** field (Not started / In Progress / Done) that the team updates by hand as work happens. That keeps this page from ever showing a stale count. As of this update, every Phase 1 and Phase 2 item is still "Not started."
 
@@ -62,6 +62,7 @@ Several stories (in both phases) have unresolved open questions noted inline (OQ
 
 ## Recent changes
 
+- **CHG-010 through CHG-017** (2026-07-13) — Resolved the remaining open assumption/questions ahead of vacation: AS-001 (trained = certified + healthcare professional), OQ-007 (sub-second = flat <1s), OQ-009 (90-day retention placeholder), OQ-012 (offline/force-closed = not reached), OQ-013 (no back-out after accepting), OQ-008 (battery-friendly = dev discretion, no number), OQ-010 (encryption = TLS + at-rest defaults, no key-mgmt spec), OQ-014 (expired cert = excluded not demoted; in-flight incidents never interrupted). US-206 moved from Ready (conditional) to fully Ready. Only OQ-002 (future AED theme) and OQ-015 (measurement methodology, non-blocking) remain open → [[06-change-log]]
 - **CHG-009** (2026-07-13) — Rescoped Phase 2 down to the simple core notification loop (9 stories); deferred auth/MFA, certification workflow, location consent, and country portability/admin tools (15 stories) to Phase 3. Nothing deleted — all IDs, content, and specs kept intact → [[06-change-log]]
 - **Phase 2 backlog + specs** (2026-07-13) — 24 stories across EPIC-4..8 originally drafted from 02-scope-and-context-v1.md §4, in the new flat/no-repo-tag/no-enabler format (see CLAUDE.md), before being rescoped by CHG-009 above. One dev-ready spec per story in [[04-speckit-specs/00-index|speckit specs]]. This initial draft was a full pipeline run (Step 3 + Step 4), not itself a CHG.
 - **CHG-003 through CHG-008** (2026-07-13) — Resolved six open questions ahead of Phase 2 backlog work: OQ-001 (tier breakdown — healthcare professional is its own tier), OQ-006 (navigation provider — dev's choice), OQ-011 (roles simplified to dispatcher + admin), OQ-003 (geospatial DB — dev's choice), OQ-004 (push reliability approach — dev's choice, focus on normal devices), OQ-005 (country-abstraction approach — dev's choice). US-101 and US-104 moved from Ready (conditional) to fully Ready, no rework needed → [[06-change-log]]
@@ -78,7 +79,7 @@ None. Every Phase 1 story/enabler is Ready — see [[04-speckit-specs/blocked-st
 | US-101 — Sign up with tier | volunteer-app | OQ-001 — final volunteer tier breakdown | Resolved — CHG-003 (2026-07-13), no rework needed |
 | US-104 — Navigate to the scene | volunteer-app | OQ-006 — navigation provider conflict | Resolved — CHG-004 (2026-07-13), no rework needed |
 
-The open questions that used to block Phase 2 theming are also resolved: OQ-001, OQ-003, OQ-004, OQ-005, and OQ-011 (tiering, geospatial search, push reliability, country abstraction, role permissions) were all closed via CHG-003 through CHG-008 (2026-07-13) — most delegated to the development team's technical discretion per Mohamed's direction, keeping the vault's own requirements purely functional. See [[05-traceability-matrix|traceability matrix]] §5 and [[06-change-log|change log]].
+The open questions that used to block Phase 2 theming are also resolved: OQ-001, OQ-003, OQ-004, OQ-005, and OQ-011 (tiering, geospatial search, push reliability, country abstraction, role permissions) were all closed via CHG-003 through CHG-008 (2026-07-13) — most delegated to the development team's technical discretion per Mohamed's direction, keeping the vault's own requirements purely functional. AS-001 and OQ-007/008/009/010/012/013/014 were resolved the same day via CHG-010 through CHG-017. Only OQ-002 (future AED theme, out of scope) and OQ-015 (non-blocking measurement methodology) remain open. See [[05-traceability-matrix|traceability matrix]] §5 and [[06-change-log|change log]].
 
 ## Other
 

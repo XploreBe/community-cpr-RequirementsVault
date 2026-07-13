@@ -294,7 +294,7 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Depends on / Blocked by:** —
 - **Status:** Deferred to Phase 3 [CHG-009] — not needed to make the core notification loop (EPIC-5/7) real; Phase 1 already proved the dispatcher side works without login.
 - **Delivery status:** Not started
-- **Notes:** Encryption scope (REQ-N-006) and audit logging (REQ-N-008) apply to this story's login flow but are tracked as cross-cutting NFRs below (see "Non-functional requirements — Phase 2"), not as separate acceptance criteria here, since their precise scope is still open (OQ-010 for encryption).
+- **Notes:** Encryption scope (REQ-N-006) and audit logging (REQ-N-008) apply to this story's login flow but are tracked as cross-cutting NFRs below (see "Non-functional requirements — Phase 2"), not as separate acceptance criteria here. OQ-010 resolved [CHG-016]: minimum HTTPS/TLS in transit plus at-rest encryption for sensitive fields via the chosen datastore's defaults, no specific key-management scheme mandated.
 
 ### US-202 — Complete MFA at login
 - **Type:** Story
@@ -343,7 +343,7 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Depends on / Blocked by:** —
 - **Status:** Ready
 - **Delivery status:** Not started
-- **Notes:** [CHG-009] Per-country-configurable radius bands (REQ-N-016) is deferred along with the rest of country portability (EPIC-8) — build with one simple, system-wide set of radius bands for now; making it per-country configurable is a Phase 3 extension, not a rebuild. Also, since background-location consent/tracking (US-214) is deferred, this search uses each volunteer's registered/last-known location rather than continuous live GPS — flag this as a stated simplification, not an invented requirement. REQ-N-017 (sub-second response) is a performance target — tracked under "Non-functional requirements — Phase 2" below, not a pass/fail criterion, since "sub-second" isn't precisely defined yet (OQ-007, open). The specific geospatial database/indexing technology is a development-team decision (OQ-003 resolved — CHG-006).
+- **Notes:** [CHG-009] Per-country-configurable radius bands (REQ-N-016) is deferred along with the rest of country portability (EPIC-8) — build with one simple, system-wide set of radius bands for now; making it per-country configurable is a Phase 3 extension, not a rebuild. Also, since background-location consent/tracking (US-214) is deferred, this search uses each volunteer's registered/last-known location rather than continuous live GPS — flag this as a stated simplification, not an invented requirement. REQ-N-017 (sub-second response) is a performance target — tracked under "Non-functional requirements — Phase 2" below; OQ-007 resolved [CHG-011] — kept simple, a flat "under 1 second," no benchmark methodology specified. The specific geospatial database/indexing technology is a development-team decision (OQ-003 resolved — CHG-006).
 
 ### US-205 — Send an alert to identified volunteers
 - **Type:** Story
@@ -360,15 +360,15 @@ None this round. Everything identified as needing real backend logic, auth, or u
 
 ### US-206 — Tiered notification order
 - **Type:** Story
-- **Story:** As a dispatcher, I want the alert to go to certified responders first, so that the most qualified volunteers get the first chance to respond.
+- **Story:** As a dispatcher, I want the alert to go to trained responders first, so that the most qualified volunteers get the first chance to respond.
 - **Acceptance criteria:**
-  - Given nearby volunteers span more than one tier, when an alert is sent, then certified/verified CPR-BLS volunteers are notified first, ahead of healthcare-professional and willing-but-untrained tiers (REQ-F-008, tier breakdown confirmed — OQ-001 [CHG-003]).
+  - Given nearby volunteers span more than one tier, when an alert is sent, then certified/verified CPR-BLS **and** healthcare-professional volunteers are notified together in the first wave, ahead of the willing-but-untrained tier (REQ-F-008, tier breakdown confirmed — OQ-001 [CHG-003]; "trained" defined — AS-001 [CHG-010]).
   - Rule: tiering/ordering/distance rules use one simple, system-wide configuration for now — per-country configurability (REQ-N-016, EPIC-8) is deferred to Phase 3 [CHG-009], not built here.
 - **Priority:** Must · **Size:** M (provisional) · **Phase/Sprint:** Phase 2
 - **Epic:** EPIC-5 · **Traces to:** REQ-F-008, REQ-F-032
-- **Grounding:** Derived — rests on AS-001 (an open assumption: whether the brief's "trained volunteers" phrase in the core flow means the same as the "certified" tier). AS-001 was not resolved by CHG-003 (see 01-requirements-structured-v1.md §6) and remains a standing assumption; flag to Mohamed if it needs explicit confirmation before build.
+- **Grounding:** Direct — AS-001 resolved [CHG-010]: "trained volunteers" means certified/verified CPR-BLS and healthcare professional combined, not certified alone.
 - **Depends on / Blocked by:** —
-- **Status:** Ready (conditional — rests on AS-001)
+- **Status:** Ready [CHG-010]
 - **Delivery status:** Not started
 
 ### US-207 — Widen the alert pool after a timeout
@@ -398,7 +398,7 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Depends on / Blocked by:** US-205
 - **Status:** Ready
 - **Delivery status:** Not started
-- **Notes:** Whether a volunteer can back out after already accepting (as opposed to declining before accepting), and how that's reflected here, is OQ-013 (open, carried from Phase 1's US-103 spec) — do not invent that behaviour; if it's needed, raise it as its own follow-up once OQ-013 is answered.
+- **Notes:** OQ-013 resolved [CHG-014]: a volunteer cannot back out after already accepting — once accepted, accepted. No "back out" status or handling in this view.
 
 ### US-209 — Full dispatch audit trail
 - **Type:** Story
@@ -412,7 +412,7 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Depends on / Blocked by:** US-205
 - **Status:** Ready
 - **Delivery status:** Not started
-- **Notes:** [CHG-009] Written for the dispatcher only for now — the admin cross-incident view that also consumed this trail (US-203) is deferred to Phase 3; nothing here needs to change when that lands, it just gets a second consumer later. REQ-N-010 (patient location shall not be retained longer than necessary) applies to this trail's data — the precise retention period is OQ-009 (open); do not implement an automatic-deletion job against a guessed number. Build the audit trail itself now; wire in the retention/deletion policy once OQ-009 is answered.
+- **Notes:** [CHG-009] Written for the dispatcher only for now — the admin cross-incident view that also consumed this trail (US-203) is deferred to Phase 3; nothing here needs to change when that lands, it just gets a second consumer later. REQ-N-010 (patient location shall not be retained longer than necessary) applies to this trail's data — OQ-009 resolved [CHG-012]: 90-day retention, a placeholder value pending real legal review per deployment jurisdiction.
 
 ---
 
@@ -441,9 +441,9 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Epic:** EPIC-6 · **Traces to:** REQ-F-017
 - **Grounding:** Direct
 - **Depends on / Blocked by:** US-210 (also deferred)
-- **Status:** Deferred to Phase 3 [CHG-009] — depends on certification upload (US-210), which is deferred; also still rests on OQ-014 (see original Notes).
+- **Status:** Deferred to Phase 3 [CHG-009] — depends on certification upload (US-210), which is deferred.
 - **Delivery status:** Not started
-- **Notes:** What actually happens once flagged expired — demoted to a lower tier, excluded from alerts entirely, or something else — is OQ-014 (open). This story covers tracking and flagging only; do not invent the downstream consequence. Raise the consequence behaviour as its own story once OQ-014 is answered.
+- **Notes:** OQ-014 resolved [CHG-017]: once flagged expired, the volunteer is excluded from new alerts until re-verified — no automatic tier demotion. This story covers tracking and flagging; the exclusion behaviour itself is enforced at alert-send time (US-206/US-205), not here.
 
 ### US-212 — Remind volunteer to re-verify before expiry
 - **Type:** Story
@@ -485,7 +485,7 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Depends on / Blocked by:** —
 - **Status:** Deferred to Phase 3 [CHG-009] — continuous background-location tracking is real infrastructure, not needed for the simple core loop. US-204's nearby-volunteer search uses each volunteer's registered/last-known location instead for now (see US-204's Notes) — a stated simplification, not silently dropped scope.
 - **Delivery status:** Not started
-- **Notes:** REQ-N-018 (battery-friendly tracking) applies here — "battery-friendly" isn't precisely defined (OQ-008, open); tracked under "Non-functional requirements — Phase 2" below rather than a specific sampling-interval number invented here.
+- **Notes:** REQ-N-018 (battery-friendly tracking) applies here — OQ-008 resolved [CHG-015]: no concrete sampling-interval or battery-drain number, "reasonable battery use, no aggressive constant GPS polling," left to the dev team's discretion.
 
 ### US-215 — View volunteer status and certification history (admin)
 - **Type:** Story
@@ -517,7 +517,7 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Depends on / Blocked by:** US-205
 - **Status:** Ready
 - **Delivery status:** Not started
-- **Notes:** What happens if the volunteer's device is offline, has no signal, or the app was force-closed by the OS (OQ-012, open) is not covered here — do not invent retry/queueing behaviour; raise as a follow-up once OQ-012 is answered.
+- **Notes:** OQ-012 resolved [CHG-013]: offline/no-signal/force-closed counts simply as "not reached" — no retry/queueing logic; widening (US-207) proceeds as if the alert had been ignored.
 
 ### US-217 — Push alert attempts DND bypass
 - **Type:** Story
@@ -603,7 +603,7 @@ None this round. Everything identified as needing real backend logic, auth, or u
 - **Depends on / Blocked by:** —
 - **Status:** Deferred to Phase 3 [CHG-009] — admin tooling; admin (US-203) is deferred.
 - **Delivery status:** Not started
-- **Notes:** What happens to an in-flight incident if a notified/accepted volunteer's account is deactivated mid-response is OQ-014 (open, shared with US-211) — do not invent that behaviour here.
+- **Notes:** OQ-014 resolved [CHG-017]: an in-flight incident is never interrupted — a volunteer already notified/accepted stays active on that incident even if deactivated mid-response. No auto-widening or auto-reassignment triggered by the deactivation.
 
 ### US-223 — Admin verifies volunteer certifications
 - **Type:** Story
@@ -641,7 +641,7 @@ These are cross-cutting quality targets rather than standalone user stories (per
 |-------------|-----------|--------|
 | REQ-N-002 (99.9% uptime, dispatch path) | EPIC-5 (US-204..209) | Open — no blocking OQ, but no measurement approach defined yet either; track alongside OQ-015. |
 | REQ-N-003 (graceful degradation if a dependency fails) | EPIC-5, EPIC-7 (US-216, US-218) | Open — no blocking OQ; standard engineering practice, not a story. |
-| REQ-N-017 (sub-second nearby-volunteer search) | EPIC-5 (US-204) | Blocked on OQ-007 (precise definition of "sub-second" — under what concurrency/region/volunteer-count). |
+| REQ-N-017 (sub-second nearby-volunteer search) | EPIC-5 (US-204) | OQ-007 resolved [CHG-011] — kept simple, flat "under 1 second," no benchmark methodology specified. |
 
 Deferred to Phase 3 with their stories: REQ-N-006 (encryption), REQ-N-007 (least-privilege), REQ-N-008 (audit logging) — all attached to EPIC-4 (deferred); REQ-N-018 (battery-friendly location) — attached to US-214 (deferred); REQ-N-004, REQ-N-012..016 (country portability) — attached to EPIC-8 (deferred).
 
@@ -671,7 +671,7 @@ Phase 2 is now just the simple core loop (9 stories), so the order is short:
 - **AED-fetch flow / AED registry** — still explicitly out of scope per the brief; blocked on OQ-002 (AED data sourcing), which remains unresolved. Not drafted as a story.
 - **Reporting & analytics** — still explicitly deferred per the brief; no requirements captured for it yet (would need its own requirements-structuring pass before it could become a story).
 - **iOS volunteer app** — still "Android only for now" (CON-001); no story drafted.
-- **Volunteer back-out-after-accepting behaviour, offline/force-closed device handling, and certification-expiry consequences** — these would need OQ-013, OQ-012, and OQ-014 resolved respectively before they can become real acceptance criteria; flagged inline on US-208, US-216 above rather than invented.
+- **Volunteer back-out-after-accepting behaviour, offline/force-closed device handling, and certification-expiry consequences** — OQ-013, OQ-012, and OQ-014 resolved [CHG-014, CHG-013, CHG-017]; each answer is simple enough to fold directly into the existing stories' acceptance criteria (US-208/US-103, US-216, US-211/US-222) rather than needing its own new story.
 
 ---
 

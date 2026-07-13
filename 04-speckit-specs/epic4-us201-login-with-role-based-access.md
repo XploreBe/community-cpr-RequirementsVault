@@ -45,7 +45,7 @@ Given a dispatcher account, when that user attempts to reach an admin-only scree
 - Encryption scope and security audit logging for this login flow — tracked as cross-cutting NFRs in 03-product-backlog-v1.md ("Non-functional requirements — Phase 2"), not specified here.
 
 **Unresolved:**
-- OQ-010 (precise scope of "encryption everywhere") — affects how login credentials/tokens are protected in transit and at rest. Build at minimum HTTPS in transit (already required by CON-004/005); do not guess at broader scope (at-rest encryption, key management) until OQ-010 is answered.
+- None blocking. OQ-010 resolved [CHG-016]: minimum HTTPS/TLS in transit everywhere, plus at-rest encryption for sensitive fields (credentials/tokens included) via the chosen datastore's defaults — no specific key-management scheme mandated, left to the dev team.
 
 ---
 

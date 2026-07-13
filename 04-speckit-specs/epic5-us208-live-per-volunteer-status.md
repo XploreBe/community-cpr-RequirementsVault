@@ -39,7 +39,7 @@ Given no volunteers have been notified for this incident yet, when the dispatche
 - Whether a volunteer can back out after already accepting (as opposed to declining before accepting) — see Unresolved.
 
 **Unresolved:**
-- OQ-013 (can a volunteer back out after accepting, and if so does the dispatcher get notified / does the pool widen again) — carried over from Phase 1's US-103 spec, still open. Do not build "back out" handling; if this status view needs to reflect it, that's a follow-up once OQ-013 is answered.
+- None blocking. OQ-013 resolved [CHG-014]: no back-out after accepting — once accepted, accepted. No "back out" status or handling to build in this round.
 
 ---
 

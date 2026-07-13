@@ -37,7 +37,7 @@ Given a volunteer does not act on the reminder and the certification expires any
 
 ## Out of scope
 
-- What happens if the volunteer never re-verifies and the certification expires — US-211 / OQ-014.
+- What happens if the volunteer never re-verifies and the certification expires — US-211 (OQ-014 resolved [CHG-017]: excluded from new alerts until re-verified, no auto-demotion).
 
 **Unresolved:**
 - None blocking. Timing/channel is intentionally left to the dev team rather than an open BA question.

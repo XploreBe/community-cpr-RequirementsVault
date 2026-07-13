@@ -43,7 +43,7 @@ Location is collected only while an incident/event is active for that volunteer,
 - The specific sampling interval or battery-drain budget for background tracking — see Unresolved.
 
 **Unresolved:**
-- OQ-008 (precise definition of "battery-friendly" — target sampling interval or battery-drain budget) — do not invent a specific number; treat as a dev-team engineering target pending definition.
+- None blocking. OQ-008 resolved [CHG-015]: no concrete number — "reasonable battery use, no aggressive constant GPS polling," left to the dev team's discretion.
 
 ---
 
