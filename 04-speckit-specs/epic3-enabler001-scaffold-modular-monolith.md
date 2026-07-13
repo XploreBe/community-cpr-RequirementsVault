@@ -39,10 +39,10 @@ Given the service is running, when a health-check endpoint is called, then it re
 ## Out of scope
 
 - Any real logic inside the Auth/MFA/Roles, Geospatial, or Notifications modules (Phase 2).
-- Choosing the specific database/indexing technology (OQ-003) — this enabler defines module boundaries in code, not the datastore.
+- Choosing the specific database/indexing technology (OQ-003 resolved [CHG-006] — delegated to the dev team) — this enabler defines module boundaries in code, not the datastore.
 
-**Unresolved — dev should not implement until confirmed:**
-- OQ-005 (country-abstraction approach) — affects how the Countries/Config module boundary should ultimately be shaped. Scaffold it as an empty module now; do not guess at its internal design.
+**Unresolved:**
+- ~~OQ-005 (country-abstraction approach)~~ — RESOLVED [CHG-008]: delegated to the dev team. Still scaffold Countries/Config as an empty module for now — the internal design is the dev team's call, not something this enabler needs to guess at.
 
 ---
 

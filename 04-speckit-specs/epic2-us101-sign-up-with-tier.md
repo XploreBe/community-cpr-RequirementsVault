@@ -25,8 +25,8 @@ Given the sign-up form, when a volunteer submits without selecting a tier, then 
 ### Scenario 3 — Duplicate account (negative)
 Given the sign-up form, when a volunteer submits with an identifier already used in the mocked dataset (e.g. the same email), then sign-up is rejected with a duplicate-account message.
 
-### Scenario 4 — Provisional tier list
-The tier selector offers exactly three options: certified, healthcare professional, willing-but-untrained — the brief's own provisional names. This list is not final (OQ-001); do not add, remove, or relabel options without confirming first.
+### Scenario 4 — Confirmed tier list [CHG-003]
+The tier selector offers exactly three options: certified/verified CPR-BLS, healthcare professional (its own separate tier), willing-but-untrained. This is the confirmed final list (OQ-001 resolved) — do not add, remove, or relabel options without a new change record.
 
 ---
 
@@ -35,7 +35,7 @@ The tier selector offers exactly three options: certified, healthcare profession
 - Mocked persistence only — no real backend call, no certification upload in this story (that's Phase 2 — REQ-F-016).
 - No login/auth beyond this local account creation.
 - Android-only, React Native (CON-001).
-- Provisional assumption (to confirm): the three-tier list above, per OQ-001.
+- Tier list confirmed [CHG-003, OQ-001 resolved]: certified/verified CPR-BLS, healthcare professional (separate tier), willing-but-untrained.
 
 ---
 
@@ -45,11 +45,11 @@ The tier selector offers exactly three options: certified, healthcare profession
 - Availability modes (always on / scheduled / do-not-disturb) (Phase 2 — REQ-F-019).
 - Background location collection and consent recording (Phase 2 — REQ-F-020, REQ-F-023).
 
-**Unresolved — dev should not implement until confirmed:**
-- OQ-001 (final tier breakdown) — affects Scenario 4. Build with the three-option list as given; do not guess at a different or more granular breakdown.
+**Unresolved:**
+- ~~OQ-001 (final tier breakdown)~~ — RESOLVED [CHG-003]: three-tier list confirmed as given in Scenario 4, no further confirmation needed.
 
 ---
 
 ## Constitution snippet
 
-- Treat the tier list as configuration, not a hard-coded enum baked into UI logic — OQ-001 is very likely to change it.
+- Treat the tier list as configuration, not a hard-coded enum baked into UI logic. Tier list is now confirmed [CHG-003], but keeping it configurable remains good practice in case tier definitions evolve later.

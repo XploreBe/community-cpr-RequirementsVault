@@ -52,11 +52,11 @@ When the pipeline runs for the first time, it creates these files:
 | `AS-xxx` | Assumption | Step 1 |
 | `EPIC-x` | Epic | Step 3 |
 | `US-xxx` | User story | Step 3 |
-| `SPIKE-xxx` | Research spike | Step 3 |
-| `ENABLER-xxx` | Technical enabler | Step 3 |
 | `CHG-xxx` | Change record | Change management |
 
 IDs are permanent once assigned. A changed requirement keeps its ID — only its content changes.
+
+**Note on `SPIKE-xxx` / `ENABLER-xxx`:** these prefixes exist only in Phase 1 (the first pipeline run, single-team, multi-repo era). Since the team consolidated into one repo and moved to spec-driven development at pickup time, backlog work from Phase 2 onward does not use spikes or enablers, and does not split stories by repo — see the updated Step 3 and Step 4 below. Do not add new spikes/enablers to Phase 2+ backlog items; if something looks like it needs one, raise it as an `OQ-xxx` instead or write it as a plain user story.
 
 ---
 
@@ -84,6 +84,12 @@ IDs are permanent once assigned. A changed requirement keeps its ID — only its
 3. Run the skill using `02-scope-and-context-v1.md` and `01-requirements-structured-v1.md` as input
 4. Save output as `03-product-backlog-v1.md`
 
+**Phase 2 onward — format changes from Phase 1:**
+- **No repo-tagging.** The team works out of one consolidated repo now. Do not group or tag stories by dispatcher-web / volunteer-app / backend-api. One flat backlog, organised by epic only.
+- **No enablers, no spikes.** Write everything as a plain `US-xxx` user story. If a genuine unknown blocks a story, raise it as an `OQ-xxx` in the requirements doc (via change-management if requirements are already published) rather than writing a `SPIKE-xxx`.
+- **Keep stories simple and purely functional.** Ground every story in what the requirements actually say. Do not add unrequested complexity (e.g. MFA, rate limiting, audit logging) unless a `REQ-F-xxx`/`REQ-N-xxx`/`CON-xxx` calls for it. When in doubt, leave it out and raise an OQ instead of gold-plating.
+- Phase 1 stories already in `03-product-backlog-v1.md` keep their old repo-tagged/enabler format as historical record — don't rewrite them to match. Only new Phase 2+ stories use the new format.
+
 ### Step 4 — Speckit specs
 1. Read `00-pipeline-skills/speckit-spec/SKILL.md` fully
 2. Read `00-pipeline-skills/speckit-spec/assets/speckit-spec-template.md`
@@ -92,6 +98,8 @@ IDs are permanent once assigned. A changed requirement keeps its ID — only its
 5. Save spec files to `04-speckit-specs/[epic-id]-[story-id]-[slug].md`
 6. Save `04-speckit-specs/00-index.md` listing all spec files with wikilinks
 7. Save `04-speckit-specs/blocked-stories.md`
+
+Still generated automatically from Phase 2 onward, same as Phase 1 — the only Phase 2+ change is in Step 3 (no repo-tagging, no enablers/spikes). Specs continue to be produced per Ready story as before.
 
 ### Step 5 — Traceability matrix
 Build `05-traceability-matrix.md` with five tables:
