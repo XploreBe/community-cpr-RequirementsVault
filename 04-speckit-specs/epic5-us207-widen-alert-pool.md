@@ -47,4 +47,4 @@ Given the pool has already widened to the broadest tier (willing-but-untrained) 
 
 ## Constitution snippet
 
-- Widening window and tier sequence must be read from per-country configuration, never hard-coded.
+- Widening window and tier sequence must be read from one system-wide configuration for now [CHG-009] — per-country configurability is deferred to Phase 3 (US-221); do not hard-code values inline in the widening logic even for a single config, since that's what US-221 will later replace.

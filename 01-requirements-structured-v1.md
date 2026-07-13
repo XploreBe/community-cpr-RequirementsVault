@@ -125,7 +125,7 @@ Community CPR Volunteer Dispatch is a system that lets a 911/112 dispatcher pin 
 - **AED** — automated external defibrillator; AED-fetch flow and AED registry are both out of scope for the MVP (Section 9).
 - **EMS** — emergency medical services (the ambulance crew).
 - **MFA** — multi-factor authentication, required for dispatcher accounts (REQ-N-005).
-- **Walking skeleton** — term used by Mohamed (chat, 2026-07-06) for the Phase 1 approach: each repo (volunteer-app, dispatcher-web, backend-api) builds a small, working, end-to-end slice against mocked data/dependencies before real integration. This is a phasing decision, not a system requirement — carried into 02-scope-and-context-v1.md rather than into this document.
+- **Walking skeleton** — term used by Mohamed (chat, 2026-07-06) for the Phase 1 approach: each repo (volunteer-app, dispatcher-web, backend-api) builds a small, working, end-to-end slice against mocked data/dependencies before real integration. This is a phasing decision, not a system requirement — carried into [[02-scope-and-context-v1]] rather than into this document.
 
 ## 8. Out of scope (explicitly stated)
 
