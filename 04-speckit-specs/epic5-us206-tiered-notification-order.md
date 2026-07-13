@@ -47,4 +47,4 @@ Tiering and ordering rules are configurable (REQ-F-032) rather than hard-coded i
 
 ## Constitution snippet
 
-- Read tier order and distance rules from per-country configuration at alert time — never hard-code a single global tiering sequence.
+- Read tier order and distance rules from one system-wide configuration for now [CHG-009] — per-country configurability is deferred to Phase 3 (US-221); do not hard-code values inline in alert-send logic even for a single config, since that's what US-221 will later replace.

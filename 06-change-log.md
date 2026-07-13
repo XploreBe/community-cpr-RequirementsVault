@@ -35,6 +35,8 @@ Changes are listed newest first. Each entry is permanent — never deleted or ed
 - None to build Phase 2 now — the 9 active stories and their specs are ready as-is.
 - When Phase 3 is eventually picked up, split US-220 (configure country settings) before sprinting on it — it was already flagged in the original draft as bundling 4 requirements into one oversized story.
 
+**Addendum (2026-07-13, full vault health check):** A full cross-file audit found this rescoping had been applied inconsistently in a few spots and corrected them — no new decision, just finishing CHG-009's own rollout: `05-traceability-matrix.md` §5 (Open Questions table) still tagged US-214/OQ-008, US-201/OQ-010, and US-211+US-222/OQ-014 as "(Phase 2)" — corrected to Phase 3; `02-scope-and-context-v1.md` §2 and §7 still presented the whole Fase-2 theme and its login/MFA, certification, and country-portability/admin rows as undifferentiated current Phase 2 scope with no pointer to the split — added CHG-009 annotations; `04-speckit-specs/epic5-us206-tiered-notification-order.md` and `epic5-us207-widen-alert-pool.md` still instructed devs in their Constitution snippet to read tier order/widening rules from "per-country configuration," contradicting their own (correctly trimmed) Constraints sections — corrected to the system-wide-for-now wording used elsewhere. No IDs, requirements, or story scope changed — bookkeeping only.
+
 ---
 
 ## CHG-008 — Resolve OQ-005 (country-abstraction technical approach)

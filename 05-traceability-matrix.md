@@ -142,11 +142,11 @@ None of the non-functional requirements are implemented in Phase 1 — the walki
 | OQ-005 | Country-abstraction technical approach | **Resolved — CHG-008.** Delegated to dev team. REQ-N-012..016, REQ-F-032 (Phase 2) can now be scoped; shape of the Countries/Config module (ENABLER-001) is a dev decision. |
 | OQ-006 | Navigation provider conflict (Google Maps vs. OSM/MapLibre/OSRM) | **Resolved — CHG-004.** Provider is a dev decision. Unblocked US-104 (Phase 1, no rework needed); REQ-F-026 stands as written. |
 | OQ-007 | Precise "sub-second" definition | REQ-N-017, US-204 (Phase 2) — not blocking, tracked as an open cross-cutting NFR |
-| OQ-008 | Precise "battery-friendly" definition | REQ-N-018, US-214 (Phase 2) — not blocking, tracked as an open cross-cutting NFR |
+| OQ-008 | Precise "battery-friendly" definition | REQ-N-018, US-214 (Phase 3, deferred [CHG-009]) — not blocking, tracked as an open cross-cutting NFR |
 | OQ-009 | Patient location retention period | REQ-N-010, US-209 (Phase 2) — not blocking; do not build auto-deletion against a guessed number |
-| OQ-010 | Scope of "encryption everywhere" | REQ-N-006, US-201 (Phase 2) — not blocking; build HTTPS-in-transit minimum, do not guess broader scope |
+| OQ-010 | Scope of "encryption everywhere" | REQ-N-006, US-201 (Phase 3, deferred [CHG-009]) — not blocking; build HTTPS-in-transit minimum, do not guess broader scope |
 | OQ-011 | Role permission boundaries (dispatcher/supervisor/admin) | **Resolved — CHG-005.** Simplified to two roles (dispatcher, admin). REQ-F-001 (Phase 2) scoped as US-201/US-203. |
 | OQ-012 | Offline/connectivity handling for alerts | REQ-F-021, REQ-N-001, US-216 (Phase 2) — flagged in US-216's spec as unresolved, do not invent retry/queueing behaviour |
 | OQ-013 | Can a volunteer back out after accepting? | REQ-F-024, REQ-F-010, US-208 (Phase 2) — noted as unresolved in US-103's and US-208's specs |
-| OQ-014 | Certification-expiry consequence; mid-incident volunteer deactivation | REQ-F-017, REQ-F-018, REQ-F-035, US-211, US-222 (Phase 2) — flagged in both specs as unresolved |
+| OQ-014 | Certification-expiry consequence; mid-incident volunteer deactivation | REQ-F-017, REQ-F-018, REQ-F-035, US-211, US-222 (Phase 3, deferred [CHG-009]) — flagged in both specs as unresolved |
 | OQ-015 | Measurement of the 5s/95% target and the widening delay | REQ-N-001, REQ-F-009, US-207, US-216 (Phase 2) — flagged in both specs as unresolved |
