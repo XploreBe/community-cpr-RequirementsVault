@@ -276,7 +276,7 @@ None this round. Everything identified as needing real backend logic, auth, or u
 
 ---
 
-# Phase 2 Backlog
+## Phase 2 Backlog
 
 ## EPIC-4 — Authentication & roles
 
