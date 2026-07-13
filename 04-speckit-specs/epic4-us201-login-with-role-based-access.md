@@ -5,6 +5,7 @@
 **Traces to:** REQ-F-001, REQ-N-007
 **Date:** 2026-07-13
 **Produced by:** speckit-spec skill
+**Status:** Deferred to Phase 3 [CHG-009, 2026-07-13] — not part of the current Phase 2 round (the simple core notification loop). Kept as-is, ready to pick up when auth is prioritized.
 
 ---
 

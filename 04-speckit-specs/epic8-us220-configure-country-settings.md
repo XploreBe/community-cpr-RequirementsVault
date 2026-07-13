@@ -5,6 +5,7 @@
 **Traces to:** REQ-N-012, REQ-N-013, REQ-N-014, REQ-N-015
 **Date:** 2026-07-13
 **Produced by:** speckit-spec skill
+**Status:** Deferred to Phase 3 [CHG-009, 2026-07-13] — country portability deferred. Also flagged in the backlog as the single largest/riskiest story in the original draft (bundles 4 requirements) — split it before sprinting on it whenever it's picked up.
 
 ---
 

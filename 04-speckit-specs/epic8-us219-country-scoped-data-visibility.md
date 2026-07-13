@@ -5,6 +5,7 @@
 **Traces to:** REQ-F-036, REQ-N-004
 **Date:** 2026-07-13
 **Produced by:** speckit-spec skill
+**Status:** Deferred to Phase 3 [CHG-009, 2026-07-13] — country portability, whole of EPIC-8, is explicitly deferred; system runs single-country for now. Kept as-is, ready to pick up later.
 
 ---
 

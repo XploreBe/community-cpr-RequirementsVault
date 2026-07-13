@@ -5,6 +5,7 @@
 **Traces to:** REQ-N-016, REQ-F-032
 **Date:** 2026-07-13
 **Produced by:** speckit-spec skill
+**Status:** Deferred to Phase 3 [CHG-009, 2026-07-13] — country portability deferred; US-206/US-207 use one simple system-wide configuration in the meantime. Kept as-is, ready to pick up later.
 
 ---
 

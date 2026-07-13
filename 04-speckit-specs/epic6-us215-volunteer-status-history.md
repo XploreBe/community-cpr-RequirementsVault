@@ -5,6 +5,7 @@
 **Traces to:** REQ-F-035 (full)
 **Date:** 2026-07-13
 **Produced by:** speckit-spec skill
+**Status:** Deferred to Phase 3 [CHG-009, 2026-07-13] — admin-facing view; admin (US-203) is deferred. Kept as-is, ready to pick up later.
 
 ---
 

@@ -5,6 +5,7 @@
 **Traces to:** REQ-F-039
 **Date:** 2026-07-13
 **Produced by:** speckit-spec skill
+**Status:** Deferred to Phase 3 [CHG-009, 2026-07-13] — admin tooling, lowest urgency. Kept as-is, ready to pick up later.
 
 ---
 

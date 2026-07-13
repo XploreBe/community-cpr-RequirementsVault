@@ -5,6 +5,7 @@
 **Traces to:** REQ-F-017
 **Date:** 2026-07-13
 **Produced by:** speckit-spec skill
+**Status:** Deferred to Phase 3 [CHG-009, 2026-07-13] — depends on certification upload (US-210), also deferred. Kept as-is, ready to pick up later.
 
 ---
 
